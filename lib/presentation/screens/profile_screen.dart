@@ -2194,7 +2194,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           value:
                               true, // TODO: Implement actual notification state
                           onChanged: (value) => _toggleNotifications(value),
-                          activeColor: _getRoleColor(currentUser.role),
+                          activeThumbColor: _getRoleColor(currentUser.role),
                         ),
                         onTap: null, // No tap action for switch items
                       ),
@@ -2209,7 +2209,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         trailing: Switch(
                           value: false, // TODO: Implement actual theme state
                           onChanged: (value) => _toggleThemeMode(value),
-                          activeColor: _getRoleColor(currentUser.role),
+                          activeThumbColor: _getRoleColor(currentUser.role),
                         ),
                         onTap: null, // No tap action for switch items
                       ),
