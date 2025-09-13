@@ -6,6 +6,7 @@ import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/main_screen.dart';
 import 'presentation/widgets/status_gate.dart';
+import 'design_system/design_system.dart';
 
 /// Root app widget
 class MyApp extends ConsumerWidget {
@@ -18,10 +19,9 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Flutter Auth Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       routerConfig: _createRouter(ref),
       debugShowCheckedModeBanner: false,
     );

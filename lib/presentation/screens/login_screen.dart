@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import '../../design_system/design_system.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -41,100 +42,91 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Login',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
+          style: DSTypography.headlineLarge.copyWith(
+            fontSize: DSTokens.fontXL,
+            fontWeight: DSTokens.fontWeightSemiBold,
             letterSpacing: -0.5,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF2D3748),
+        backgroundColor: DSColors.lightSurface,
+        foregroundColor: DSColors.textPrimary,
         elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: DSColors.lightSurface,
           statusBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.light,
         ),
       ),
       body: Container(
-        color: const Color(0xFFF8FAFC),
+        color: DSColors.lightBackground,
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: DSTokens.spaceL,
+              vertical: DSTokens.spaceXL,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 40),
-
+                  const SizedBox(
+                    height: DSTokens.spaceXL + DSTokens.spaceS,
+                  ), // 40px
                   // Modern Icon Container
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: DSTokens.spaceXXXL + DSTokens.spaceXL, // 96px
+                    height: DSTokens.spaceXXXL + DSTokens.spaceXL, // 96px
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          const Color(0xFF3498DB).withValues(alpha: 0.2),
-                          const Color(0xFF3498DB).withValues(alpha: 0.1),
+                          DSColors.brandPrimary.withValues(alpha: 0.2),
+                          DSColors.brandPrimary.withValues(alpha: 0.1),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.lock_rounded,
-                      size: 50,
-                      color: Color(0xFF3498DB),
+                      size:
+                          DSTokens.spaceXXL +
+                          DSTokens.spaceM, // 64px - proportional to container
+                      color: DSColors.brandPrimary,
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: DSTokens.spaceXL),
 
                   // Welcome Text
-                  const Text(
+                  Text(
                     'Welcome Back',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A202C),
-                      letterSpacing: -1.0,
-                    ),
+                    style: DSTypography.displayMedium,
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: DSTokens.spaceS),
 
-                  const Text(
+                  Text(
                     'Sign in to your account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF64748B),
-                      letterSpacing: 0.1,
-                    ),
+                    style: DSTypography.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: DSTokens.spaceXXL),
 
                   // Login Form Container
                   Container(
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(DSTokens.spaceXL),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      color: DSColors.lightSurface,
+                      borderRadius: BorderRadius.circular(DSTokens.radiusXL),
+                      boxShadow: [DSTokens.shadowS],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,59 +135,65 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF1A202C),
+                          style: DSTypography.bodyLarge.copyWith(
+                            color: DSColors.textPrimary,
                           ),
                           decoration: InputDecoration(
                             labelText: 'Email Address',
-                            labelStyle: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 14,
-                            ),
-                            prefixIcon: const Icon(
+                            labelStyle: DSTypography.labelMedium,
+                            prefixIcon: Icon(
                               Icons.email_rounded,
-                              color: Color(0xFF64748B),
-                              size: 20,
+                              color: DSColors.textSecondary,
+                              size: DSTokens.fontL + DSTokens.spaceXS, // 22px
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.lightBorder,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.lightBorder,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF3498DB),
-                                width: 2,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.brandPrimary,
+                                width: DSTokens.spaceXS / 2, // 2px
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.error,
+                                width: DSTokens.spaceXXS / 2, // 1px
                               ),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 2,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.error,
+                                width: DSTokens.spaceXS / 2, // 2px
                               ),
                             ),
                             filled: true,
-                            fillColor: const Color(0xFFFAFBFC),
+                            fillColor: DSColors.surfaceContainer,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
+                              horizontal: DSTokens.spaceM,
+                              vertical: DSTokens.spaceM,
                             ),
                           ),
                           validator: (value) {
@@ -211,26 +209,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: DSTokens.spaceL),
 
                         // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF1A202C),
+                          style: DSTypography.bodyLarge.copyWith(
+                            color: DSColors.textPrimary,
                           ),
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            labelStyle: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 14,
-                            ),
-                            prefixIcon: const Icon(
+                            labelStyle: DSTypography.labelMedium,
+                            prefixIcon: Icon(
                               Icons.lock_rounded,
-                              color: Color(0xFF64748B),
-                              size: 20,
+                              color: DSColors.textSecondary,
+                              size: DSTokens.fontL + DSTokens.spaceXS, // 22px
                             ),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -242,48 +236,58 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 _isPasswordVisible
                                     ? Icons.visibility_off_rounded
                                     : Icons.visibility_rounded,
-                                color: const Color(0xFF64748B),
-                                size: 20,
+                                color: DSColors.textSecondary,
+                                size: DSTokens.fontL + DSTokens.spaceXS, // 22px
                               ),
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.lightBorder,
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.lightBorder,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF3498DB),
-                                width: 2,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.brandPrimary,
+                                width: DSTokens.spaceXS / 2, // 2px
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.error,
+                                width: DSTokens.spaceXXS / 2, // 1px
                               ),
                             ),
                             focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 2,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              borderSide: BorderSide(
+                                color: DSColors.error,
+                                width: DSTokens.spaceXS / 2, // 2px
                               ),
                             ),
                             filled: true,
-                            fillColor: const Color(0xFFFAFBFC),
+                            fillColor: DSColors.surfaceContainer,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
+                              horizontal: DSTokens.spaceM,
+                              vertical: DSTokens.spaceM,
                             ),
                           ),
                           validator: (value) {
@@ -297,34 +301,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: DSTokens.spaceL),
 
                         // Error Message
                         if (authState.error != null)
                           Container(
-                            padding: const EdgeInsets.all(16),
-                            margin: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.all(DSTokens.spaceM),
+                            margin: const EdgeInsets.only(
+                              bottom: DSTokens.spaceL,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.1),
+                              color: DSColors.error.withValues(alpha: 0.1),
                               border: Border.all(
-                                color: Colors.red.withValues(alpha: 0.3),
+                                color: DSColors.error.withValues(alpha: 0.3),
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.error_outline_rounded,
-                                  color: Colors.red,
-                                  size: 20,
+                                  color: DSColors.error,
+                                  size:
+                                      DSTokens.fontL + DSTokens.spaceXS, // 22px
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(
+                                  width: DSTokens.spaceS + DSTokens.spaceXS,
+                                ), // 12px
                                 Expanded(
                                   child: Text(
                                     authState.error!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 14,
+                                    style: DSTypography.bodySmall.copyWith(
+                                      color: DSColors.error,
                                     ),
                                   ),
                                 ),
@@ -336,51 +346,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ElevatedButton(
                           onPressed: authState.isLoading ? null : _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3498DB),
-                            foregroundColor: Colors.white,
+                            backgroundColor: DSColors.brandPrimary,
+                            foregroundColor: DSColors.textOnColor,
                             elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: DSTokens.spaceM,
                             ),
-                            disabledBackgroundColor: const Color(0xFFE2E8F0),
-                            disabledForegroundColor: const Color(0xFF64748B),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                            ),
+                            disabledBackgroundColor:
+                                DSColors.interactiveDisabled,
+                            disabledForegroundColor: DSColors.textSecondary,
                           ),
                           child: authState.isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
+                              ? SizedBox(
+                                  height:
+                                      DSTokens.fontL + DSTokens.spaceXS, // 22px
+                                  width:
+                                      DSTokens.fontL + DSTokens.spaceXS, // 22px
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                                    strokeWidth: DSTokens.spaceXS / 2, // 2px
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                                      DSColors.textOnColor,
                                     ),
                                   ),
                                 )
-                              : const Text(
+                              : Text(
                                   'Sign In',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.2,
-                                  ),
+                                  style: DSTypography.buttonLarge,
                                 ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: DSTokens.spaceXL),
 
                   // Sign Up Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Don\'t have an account? ',
-                        style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 14,
+                        style: DSTypography.bodySmall.copyWith(
+                          color: DSColors.textSecondary,
                         ),
                       ),
                       TextButton(
@@ -390,24 +402,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 context.go('/register');
                               },
                         style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF3498DB),
+                          foregroundColor: DSColors.brandPrimary,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: DSTokens.spaceS,
+                            vertical: DSTokens.spaceXS,
                           ),
                         ),
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: Text('Sign Up', style: DSTypography.link),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: DSTokens.spaceXL),
                 ],
               ),
             ),
