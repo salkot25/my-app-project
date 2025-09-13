@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'presentation/providers/auth_provider.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
-import 'presentation/screens/profile_screen.dart';
-import 'presentation/screens/user_list_screen.dart';
-import 'presentation/widgets/role_gate.dart';
+import 'presentation/screens/main_screen.dart';
 import 'presentation/widgets/status_gate.dart';
 
 /// Root app widget
@@ -78,17 +76,17 @@ class MyApp extends ConsumerWidget {
           !isLoading &&
           isPublicRoute &&
           state.fullPath != '/loading') {
-        print('Authenticated, redirecting from public route to profile');
-        return '/profile';
+        print('Authenticated, redirecting from public route to main');
+        return '/main';
       }
 
-      // If authenticated but not verified, only allow access to profile
+      // If authenticated but not verified, only allow access to main screen
       if (isAuthenticated &&
           !isLoading &&
           !isVerified &&
-          state.fullPath != '/profile') {
-        print('Not verified, redirecting to profile');
-        return '/profile';
+          state.fullPath != '/main') {
+        print('Not verified, redirecting to main');
+        return '/main';
       }
 
       print('No redirect needed');
@@ -109,16 +107,11 @@ class MyApp extends ConsumerWidget {
       ),
 
       // Protected routes
-      GoRoute(path: '/', redirect: (context, state) => '/profile'),
+      GoRoute(path: '/', redirect: (context, state) => '/main'),
       GoRoute(
-        path: '/profile',
+        path: '/main',
         builder: (context, state) =>
-            const NotSuspendedGate(child: ProfileScreen()),
-      ),
-      GoRoute(
-        path: '/users',
-        builder: (context, state) =>
-            const VerifiedGate(child: ModeratorGate(child: UserListScreen())),
+            const NotSuspendedGate(child: MainScreen()),
       ),
     ],
   );

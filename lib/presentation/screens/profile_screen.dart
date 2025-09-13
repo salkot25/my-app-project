@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
 import '../providers/auth_provider.dart';
@@ -1839,421 +1838,419 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            letterSpacing: -0.5,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF2D3748),
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
-      ),
       body: Container(
         color: const Color(0xFFF8FAFC),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Profile Header - Business Card Style
-              GestureDetector(
-                onTap: () => _showProfileDetailDialog(context, currentUser),
-                child: Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        _getRoleColor(currentUser.role),
-                        _getRoleColor(currentUser.role).withValues(alpha: 0.8),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Profile Header - Business Card Style
+                GestureDetector(
+                  onTap: () => _showProfileDetailDialog(context, currentUser),
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _getRoleColor(currentUser.role),
+                          _getRoleColor(
+                            currentUser.role,
+                          ).withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getRoleColor(
+                            currentUser.role,
+                          ).withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _getRoleColor(
-                          currentUser.role,
-                        ).withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Decorative elements
-                      Positioned(
-                        top: -30,
-                        right: -30,
-                        child: Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.1),
+                    child: Stack(
+                      children: [
+                        // Decorative elements
+                        Positioned(
+                          top: -30,
+                          right: -30,
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.1),
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: -20,
-                        left: -20,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.05),
+                        Positioned(
+                          bottom: -20,
+                          left: -20,
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.05),
+                            ),
                           ),
                         ),
-                      ),
-                      // Main content
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Row(
-                          children: [
-                            // Avatar Section
-                            Container(
-                              width: 88,
-                              height: 88,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white.withValues(alpha: 0.95),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.15),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                    spreadRadius: 2,
-                                  ),
-                                  BoxShadow(
-                                    color: _getRoleColor(
-                                      currentUser.role,
-                                    ).withValues(alpha: 0.2),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Container(
+                        // Main content
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Row(
+                            children: [
+                              // Avatar Section
+                              Container(
+                                width: 88,
+                                height: 88,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   gradient: LinearGradient(
                                     colors: [
-                                      _getRoleColor(
-                                        currentUser.role,
-                                      ).withValues(alpha: 0.1),
-                                      _getRoleColor(
-                                        currentUser.role,
-                                      ).withValues(alpha: 0.05),
+                                      Colors.white,
+                                      Colors.white.withValues(alpha: 0.95),
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 3,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
+                                      spreadRadius: 2,
+                                    ),
+                                    BoxShadow(
+                                      color: _getRoleColor(
+                                        currentUser.role,
+                                      ).withValues(alpha: 0.2),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundColor: Colors.transparent,
-                                  child: Text(
-                                    currentUser.name.isNotEmpty
-                                        ? currentUser.name[0].toUpperCase()
-                                        : 'U',
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w800,
-                                      color: _getRoleColor(currentUser.role),
-                                      letterSpacing: -1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        _getRoleColor(
+                                          currentUser.role,
+                                        ).withValues(alpha: 0.1),
+                                        _getRoleColor(
+                                          currentUser.role,
+                                        ).withValues(alpha: 0.05),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: Colors.transparent,
+                                    child: Text(
+                                      currentUser.name.isNotEmpty
+                                          ? currentUser.name[0].toUpperCase()
+                                          : 'U',
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w800,
+                                        color: _getRoleColor(currentUser.role),
+                                        letterSpacing: -1,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
 
-                            const SizedBox(width: 20),
+                              const SizedBox(width: 20),
 
-                            // Info Section
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Name with improved hierarchy
-                                  Text(
-                                    currentUser.name,
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                      letterSpacing: -0.8,
-                                      height: 1.1,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-
-                                  const SizedBox(height: 6),
-
-                                  // Role and Status Badges
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 4,
-                                    children: [
-                                      // Role Badge
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 5,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.95,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.1,
-                                              ),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              _getRoleIcon(currentUser.role),
-                                              size: 11,
-                                              color: _getRoleColor(
-                                                currentUser.role,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 3),
-                                            Text(
-                                              currentUser.role.value
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                color: _getRoleColor(
-                                                  currentUser.role,
-                                                ),
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.w700,
-                                                letterSpacing: 0.6,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      // Status Badge
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 5,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _getStatusColor(
-                                            currentUser.status,
-                                          ).withValues(alpha: 0.9),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: _getStatusColor(
-                                                currentUser.status,
-                                              ).withValues(alpha: 0.3),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              _getStatusIcon(
-                                                currentUser.status,
-                                              ),
-                                              size: 11,
-                                              color: Colors.white,
-                                            ),
-                                            const SizedBox(width: 3),
-                                            Text(
-                                              currentUser.status.value
-                                                  .toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.w700,
-                                                letterSpacing: 0.6,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 12),
-
-                                  // Email with enhanced styling
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 1,
-                                      vertical: 2,
-                                    ),
-                                    child: Text(
-                                      currentUser.email,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.9,
-                                        ),
-                                        letterSpacing: 0.3,
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.2,
+                              // Info Section
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Name with improved hierarchy
+                                    Text(
+                                      currentUser.name,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                        letterSpacing: -0.8,
+                                        height: 1.1,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                ],
+
+                                    const SizedBox(height: 6),
+
+                                    // Role and Status Badges
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: [
+                                        // Role Badge
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.95,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.1,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                _getRoleIcon(currentUser.role),
+                                                size: 11,
+                                                color: _getRoleColor(
+                                                  currentUser.role,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                currentUser.role.value
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                  color: _getRoleColor(
+                                                    currentUser.role,
+                                                  ),
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.6,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        // Status Badge
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getStatusColor(
+                                              currentUser.status,
+                                            ).withValues(alpha: 0.9),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: _getStatusColor(
+                                                  currentUser.status,
+                                                ).withValues(alpha: 0.3),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                _getStatusIcon(
+                                                  currentUser.status,
+                                                ),
+                                                size: 11,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                currentUser.status.value
+                                                    .toUpperCase(),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.6,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    // Email with enhanced styling
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 1,
+                                        vertical: 2,
+                                      ),
+                                      child: Text(
+                                        currentUser.email,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.9,
+                                          ),
+                                          letterSpacing: 0.3,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.2,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+                  ), // End of GestureDetector child (Container)
+                ), // End of GestureDetector
+
+                const SizedBox(height: 24),
+
+                // Menu Navigation Section
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                ), // End of GestureDetector child (Container)
-              ), // End of GestureDetector
+                  child: Column(
+                    children: [
+                      // Show Manage Users only for users who can view all users
+                      if (currentUser.canViewAllUsers) ...[
+                        // Manage Users - Note: Now accessible via Users tab in bottom navigation
+                        _buildMenuTile(
+                          icon: Icons.people_outline_rounded,
+                          title: 'Manage Users',
+                          subtitle: 'Available in Users tab below',
+                          trailing: Icon(
+                            Icons.info_outline_rounded,
+                            color: const Color(0xFF9CA3AF),
+                            size: 20,
+                          ),
+                          onTap: () {
+                            // Show info snackbar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Users management is available in the Users tab at the bottom',
+                                ),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          },
+                        ),
 
-              const SizedBox(height: 24),
+                        _buildDivider(),
+                      ],
 
-              // Menu Navigation Section
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // Show Manage Users only for users who can view all users
-                    if (currentUser.canViewAllUsers) ...[
-                      // Manage Users
+                      // Push Notifications
                       _buildMenuTile(
-                        icon: Icons.people_outline_rounded,
-                        title: 'Manage Users',
-                        subtitle: 'View and manage user accounts',
+                        icon: Icons.notifications_outlined,
+                        title: 'Push Notifications',
+                        subtitle: 'Manage notification preferences',
+                        trailing: Switch(
+                          value:
+                              true, // TODO: Implement actual notification state
+                          onChanged: (value) => _toggleNotifications(value),
+                          activeColor: _getRoleColor(currentUser.role),
+                        ),
+                        onTap: null, // No tap action for switch items
+                      ),
+
+                      _buildDivider(),
+
+                      // Theme Mode
+                      _buildMenuTile(
+                        icon: Icons.palette_outlined,
+                        title: 'Theme Mode',
+                        subtitle: 'Switch between light and dark theme',
+                        trailing: Switch(
+                          value: false, // TODO: Implement actual theme state
+                          onChanged: (value) => _toggleThemeMode(value),
+                          activeColor: _getRoleColor(currentUser.role),
+                        ),
+                        onTap: null, // No tap action for switch items
+                      ),
+
+                      _buildDivider(),
+
+                      // About Application
+                      _buildMenuTile(
+                        icon: Icons.info_outline_rounded,
+                        title: 'About Application',
+                        subtitle: 'App version and information',
                         trailing: Icon(
                           Icons.chevron_right_rounded,
                           color: const Color(0xFF9CA3AF),
                           size: 20,
                         ),
-                        onTap: () => context.go('/users'),
+                        onTap: () => _showAboutDialog(context),
                       ),
 
                       _buildDivider(),
+
+                      // Logout
+                      _buildMenuTile(
+                        icon: Icons.logout_rounded,
+                        title: 'Logout',
+                        subtitle: 'Sign out from your account',
+                        trailing: Icon(
+                          Icons.chevron_right_rounded,
+                          color: const Color(0xFF9CA3AF),
+                          size: 20,
+                        ),
+                        onTap: () => _showLogoutConfirmation(context),
+                        isDestructive: true,
+                      ),
                     ],
-
-                    // Push Notifications
-                    _buildMenuTile(
-                      icon: Icons.notifications_outlined,
-                      title: 'Push Notifications',
-                      subtitle: 'Manage notification preferences',
-                      trailing: Switch(
-                        value:
-                            true, // TODO: Implement actual notification state
-                        onChanged: (value) => _toggleNotifications(value),
-                        activeColor: _getRoleColor(currentUser.role),
-                      ),
-                      onTap: null, // No tap action for switch items
-                    ),
-
-                    _buildDivider(),
-
-                    // Theme Mode
-                    _buildMenuTile(
-                      icon: Icons.palette_outlined,
-                      title: 'Theme Mode',
-                      subtitle: 'Switch between light and dark theme',
-                      trailing: Switch(
-                        value: false, // TODO: Implement actual theme state
-                        onChanged: (value) => _toggleThemeMode(value),
-                        activeColor: _getRoleColor(currentUser.role),
-                      ),
-                      onTap: null, // No tap action for switch items
-                    ),
-
-                    _buildDivider(),
-
-                    // About Application
-                    _buildMenuTile(
-                      icon: Icons.info_outline_rounded,
-                      title: 'About Application',
-                      subtitle: 'App version and information',
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        color: const Color(0xFF9CA3AF),
-                        size: 20,
-                      ),
-                      onTap: () => _showAboutDialog(context),
-                    ),
-
-                    _buildDivider(),
-
-                    // Logout
-                    _buildMenuTile(
-                      icon: Icons.logout_rounded,
-                      title: 'Logout',
-                      subtitle: 'Sign out from your account',
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        color: const Color(0xFF9CA3AF),
-                        size: 20,
-                      ),
-                      onTap: () => _showLogoutConfirmation(context),
-                      isDestructive: true,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),
