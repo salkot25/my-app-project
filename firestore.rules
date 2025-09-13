@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Users can update their own profile (but not role or status)
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('status' in request.resource.data.diff(resource.data).affectedKeys());
+
+      // Admins and moderators can read all user profiles
+      allow read: if request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator']
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'verified';
+
+      // Admins and moderators can update user status
+      allow update: if request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'moderator']
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'verified'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+
+      // Only admins can update user roles
+      allow update: if request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'verified'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role', 'updatedAt']);
+
+      // Only admins can delete users
+      allow delete: if request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'verified';
+
+      // Allow creation of new user profiles (during registration)
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.role == 'user'
+        && request.resource.data.status == 'unverified';
+    }
+  }
+}
