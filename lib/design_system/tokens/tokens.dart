@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class DSTokens {
   DSTokens._(); // Private constructor to prevent instantiation
 
-  // Modern Spacing Scale - Generous for clean look
+  // Modern Spacing Scale - Generous for clean look + Ultra-minimalist options
+  static const double spaceXXXS = 1.0; // Hairline spacing for ultra-minimal
   static const double spaceXXS = 2;
   static const double spaceXS = 4;
   static const double spaceS = 8;
@@ -15,14 +16,17 @@ class DSTokens {
   static const double spaceXL = 32;
   static const double spaceXXL = 48;
   static const double spaceXXXL = 64;
+  static const double spaceUltra = 80; // For generous breathing room
 
-  // Clean Border Radius - Modern rounded corners
+  // Clean Border Radius - Modern rounded corners + Minimalist options
+  static const double radiusNone = 0; // Sharp edges for ultra-minimal
   static const double radiusXS = 4;
   static const double radiusS = 8;
   static const double radiusM = 12; // Main radius for inputs/buttons
   static const double radiusL = 16;
   static const double radiusXL = 20; // Large cards like login form
   static const double radiusXXL = 24;
+  static const double radiusGenerous = 32; // For modern generous curves
   static const double radiusCircle = 999;
 
   // Modern Typography Scale

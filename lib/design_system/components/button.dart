@@ -6,7 +6,14 @@ import '../tokens/typography.dart';
 import '../utils/animations.dart';
 
 /// Button variants following the Single Responsibility Principle
-enum ButtonVariant { primary, secondary, tertiary, danger, success }
+enum ButtonVariant {
+  primary,
+  secondary,
+  tertiary,
+  danger,
+  success,
+  ghost, // NEW: Ultra-minimal ghost button
+}
 
 /// Button sizes for consistent spacing
 enum ButtonSize { small, medium, large }
@@ -134,10 +141,27 @@ class _ButtonState extends State<Button> {
       ),
       ButtonVariant.danger => (DSColors.error, DSColors.textOnColor, null),
       ButtonVariant.success => (DSColors.success, DSColors.textOnColor, null),
+      // GHOST BUTTON: Ultra-minimal - completely transparent with subtle text
+      ButtonVariant.ghost => (
+        DSColors.transparent,
+        DSColors.textSecondary, // More subtle text color
+        null, // No border
+      ),
     };
 
     // Apply hover/focus states
     if (_isHovered || _isFocused) {
+      // GHOST BUTTON: Special hover behavior - very subtle
+      if (widget.variant == ButtonVariant.ghost) {
+        return (
+          DSColors.textSecondary.withValues(
+            alpha: 0.05,
+          ), // Very subtle background
+          DSColors.textPrimary, // Text becomes more prominent
+          null,
+        );
+      }
+
       return (
         _adjustColorBrightness(baseColors.$1, _isHovered ? -0.1 : -0.05),
         baseColors.$2,
@@ -158,6 +182,7 @@ class _ButtonState extends State<Button> {
   }
 
   Gradient? _getGradient() {
+    // MINIMALIST PRINCIPLE: Only primary gets gradient, ghost is completely clean
     if (widget.variant != ButtonVariant.primary) return null;
 
     return LinearGradient(
@@ -179,7 +204,10 @@ class _ButtonState extends State<Button> {
   }
 
   List<BoxShadow>? _getBoxShadow() {
-    if (widget.isDisabled || widget.variant == ButtonVariant.tertiary) {
+    // MINIMALIST PRINCIPLE: Ghost and tertiary buttons have no shadows at all
+    if (widget.isDisabled ||
+        widget.variant == ButtonVariant.tertiary ||
+        widget.variant == ButtonVariant.ghost) {
       return null;
     }
 

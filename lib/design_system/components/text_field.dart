@@ -3,8 +3,8 @@ import '../tokens/tokens.dart';
 import '../tokens/colors.dart';
 import '../tokens/typography.dart';
 
-/// Text field component with consistent styling and validation
-/// Follows Material Design 3 guidelines
+/// Minimalist text field component with borderless design and clean focus states
+/// Follows minimalist modern principles with underline focus instead of borders
 class CustomTextField extends StatefulWidget {
   final String? label;
   final String? hint;
@@ -22,6 +22,7 @@ class CustomTextField extends StatefulWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final bool isMinimalist; // NEW: Toggle for minimalist mode
 
   const CustomTextField({
     this.label,
@@ -40,6 +41,7 @@ class CustomTextField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
+    this.isMinimalist = true, // Default to minimalist mode
     super.key,
   });
 
@@ -93,24 +95,57 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.suffixIcon,
-            filled: true,
-            fillColor: widget.enabled
+
+            // MINIMALIST DESIGN: Clean background handling
+            filled: widget.isMinimalist
+                ? false
+                : true, // No fill for minimalist
+            fillColor: widget.isMinimalist
+                ? Colors.transparent
+                : widget.enabled
                 ? (hasError ? DSColors.error.withValues(alpha: 0.05) : null)
                 : DSColors.primary50,
-            border: _buildBorder(colorScheme.outline),
-            enabledBorder: _buildBorder(
-              hasError ? DSColors.error : colorScheme.outline,
-            ),
-            focusedBorder: _buildBorder(
-              hasError ? DSColors.error : colorScheme.primary,
-              width: 2,
-            ),
-            errorBorder: _buildBorder(DSColors.error),
-            focusedErrorBorder: _buildBorder(DSColors.error, width: 2),
-            disabledBorder: _buildBorder(DSColors.primary200),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: DSTokens.spaceM,
-              vertical: DSTokens.spaceM,
+
+            // MINIMALIST BORDERS: Clean underline design instead of outlines
+            border: widget.isMinimalist
+                ? _buildMinimalistBorder(
+                    DSColors.textTertiary.withValues(alpha: 0.3),
+                  )
+                : _buildBorder(colorScheme.outline),
+            enabledBorder: widget.isMinimalist
+                ? _buildMinimalistBorder(
+                    hasError
+                        ? DSColors.error
+                        : DSColors.textTertiary.withValues(alpha: 0.2),
+                  )
+                : _buildBorder(hasError ? DSColors.error : colorScheme.outline),
+            focusedBorder: widget.isMinimalist
+                ? _buildMinimalistBorder(
+                    hasError ? DSColors.error : colorScheme.primary,
+                    width: 2,
+                  )
+                : _buildBorder(
+                    hasError ? DSColors.error : colorScheme.primary,
+                    width: 2,
+                  ),
+            errorBorder: widget.isMinimalist
+                ? _buildMinimalistBorder(DSColors.error)
+                : _buildBorder(DSColors.error),
+            focusedErrorBorder: widget.isMinimalist
+                ? _buildMinimalistBorder(DSColors.error, width: 2)
+                : _buildBorder(DSColors.error, width: 2),
+            disabledBorder: widget.isMinimalist
+                ? _buildMinimalistBorder(
+                    DSColors.primary200.withValues(alpha: 0.1),
+                  )
+                : _buildBorder(DSColors.primary200),
+
+            // MINIMALIST PADDING: More generous spacing
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: widget.isMinimalist
+                  ? 0
+                  : DSTokens.spaceM, // No horizontal padding for minimalist
+              vertical: DSTokens.spaceL, // More vertical breathing room
             ),
             counterStyle: DSTypography.caption,
           ),
@@ -131,6 +166,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
   OutlineInputBorder _buildBorder(Color color, {double width = 1}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(DSTokens.radiusM),
+      borderSide: BorderSide(color: color, width: width),
+    );
+  }
+
+  /// MINIMALIST BORDER: Clean underline instead of full border
+  UnderlineInputBorder _buildMinimalistBorder(Color color, {double width = 1}) {
+    return UnderlineInputBorder(
       borderSide: BorderSide(color: color, width: width),
     );
   }

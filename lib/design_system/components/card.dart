@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../tokens/tokens.dart';
 import '../tokens/typography.dart';
 
-/// Card component with consistent styling and shadows
+/// Minimalist card component with clean styling and subtle shadows
+/// Follows minimalist modern design principles - no borders, clean backgrounds
 /// Supports different elevations and content layouts
 class Card extends StatelessWidget {
   final Widget child;
@@ -12,7 +13,7 @@ class Card extends StatelessWidget {
   final Color? backgroundColor;
   final double? elevation;
   final BorderRadius? borderRadius;
-  final Border? border;
+  final bool isMinimalist; // NEW: Toggle minimalist mode
 
   const Card({
     required this.child,
@@ -22,7 +23,7 @@ class Card extends StatelessWidget {
     this.backgroundColor,
     this.elevation,
     this.borderRadius,
-    this.border,
+    this.isMinimalist = true, // Default to minimalist mode
     super.key,
   });
 
@@ -35,8 +36,15 @@ class Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor ?? colorScheme.surface,
         borderRadius: borderRadius ?? BorderRadius.circular(DSTokens.radiusM),
-        border: border ?? Border.all(color: colorScheme.outline),
-        boxShadow: _getBoxShadow(),
+        // MINIMALIST PRINCIPLE: No borders! Use background differentiation instead
+        border: isMinimalist
+            ? null
+            : Border.all(
+                color: colorScheme.outline.withValues(
+                  alpha: 0.1,
+                ), // Very subtle if needed
+              ),
+        boxShadow: _getMinimalistShadow(),
       ),
       child: ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.circular(DSTokens.radiusM),
@@ -47,7 +55,11 @@ class Card extends StatelessWidget {
             borderRadius:
                 borderRadius ?? BorderRadius.circular(DSTokens.radiusM),
             child: Padding(
-              padding: padding ?? const EdgeInsets.all(DSTokens.spaceM),
+              padding:
+                  padding ??
+                  const EdgeInsets.all(
+                    DSTokens.spaceL,
+                  ), // More generous padding
               child: child,
             ),
           ),
@@ -58,14 +70,49 @@ class Card extends StatelessWidget {
     return card;
   }
 
-  List<BoxShadow>? _getBoxShadow() {
-    if (elevation == null) return null;
+  /// Minimalist shadow system - more subtle and clean
+  List<BoxShadow>? _getMinimalistShadow() {
+    if (elevation == null || elevation! <= 0) return null;
 
-    if (elevation! <= 0) return null;
-    if (elevation! <= 2) return [DSTokens.shadowXS];
-    if (elevation! <= 4) return [DSTokens.shadowS];
-    if (elevation! <= 8) return [DSTokens.shadowM];
-    return [DSTokens.shadowL];
+    // MINIMALIST PRINCIPLE: Much more subtle shadows
+    if (elevation! <= 2) {
+      return [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04), // Very subtle
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ];
+    }
+
+    if (elevation! <= 4) {
+      return [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06), // Still very subtle
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ];
+    }
+
+    if (elevation! <= 8) {
+      return [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.08), // Maximum subtlety
+          blurRadius: 16,
+          offset: const Offset(0, 6),
+        ),
+      ];
+    }
+
+    // For higher elevations, keep it clean but visible
+    return [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.1),
+        blurRadius: 20,
+        offset: const Offset(0, 8),
+      ),
+    ];
   }
 }
 
