@@ -58,7 +58,7 @@ enum AppThemeMode {
   }
 }
 
-/// Theme notifier class
+/// Theme notifier class with proper state management
 class ThemeNotifier extends AsyncNotifier<AppThemeMode> {
   static const String _themeKey = 'theme_mode';
 
@@ -98,6 +98,10 @@ class ThemeNotifier extends AsyncNotifier<AppThemeMode> {
 
     state = AsyncValue.data(themeMode);
     await _saveThemeMode(themeMode);
+
+    // Force invalidation of dependent providers to ensure UI updates
+    ref.invalidate(flutterThemeModeProvider);
+    ref.invalidate(isDarkModeProvider);
   }
 
   /// Toggle between light and dark mode (skips system)
@@ -125,7 +129,7 @@ final themeProvider = AsyncNotifierProvider<ThemeNotifier, AppThemeMode>(() {
 });
 
 /// Convenience providers
-final themeModeProvider = Provider<AppThemeMode>((ref) {
+final themeModeProvider = Provider.autoDispose<AppThemeMode>((ref) {
   final asyncTheme = ref.watch(themeProvider);
   return asyncTheme.when(
     data: (themeMode) => themeMode,
@@ -134,21 +138,24 @@ final themeModeProvider = Provider<AppThemeMode>((ref) {
   );
 });
 
-final flutterThemeModeProvider = Provider<ThemeMode>((ref) {
-  return ref.watch(themeModeProvider).themeMode;
+final flutterThemeModeProvider = Provider.autoDispose<ThemeMode>((ref) {
+  final themeMode = ref.watch(themeModeProvider);
+  return themeMode.themeMode;
 });
 
-final isThemeLoadingProvider = Provider<bool>((ref) {
+final isThemeLoadingProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(themeProvider).isLoading;
 });
 
 /// Check if current theme is dark mode
-final isDarkModeProvider = Provider<bool>((ref) {
+final isDarkModeProvider = Provider.autoDispose<bool>((ref) {
   final themeMode = ref.watch(themeModeProvider);
   if (themeMode == AppThemeMode.dark) return true;
   if (themeMode == AppThemeMode.light) return false;
 
   // For system mode, check the platform brightness
+  // Note: This will not auto-update when system theme changes during runtime
+  // To make it fully reactive, we'd need a listener for system theme changes
   final brightness =
       WidgetsBinding.instance.platformDispatcher.platformBrightness;
   return brightness == Brightness.dark;
