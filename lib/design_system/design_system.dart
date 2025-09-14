@@ -16,6 +16,10 @@ export 'components/avatar.dart'; // Avatar component dengan sizes
 // ✅ THEME CONFIGURATION
 export 'theme/app_theme.dart'; // Light & dark theme otomatis
 
+// ✅ PROVIDERS
+export 'providers/theme_provider.dart'; // Theme management
+
 // ✅ UTILS
 export 'utils/responsive.dart'; // Responsive utilities
 export 'utils/animations.dart'; // Animation utilities
+export 'utils/theme_colors.dart'; // Theme-aware colors

@@ -17,11 +17,14 @@ class MyApp extends ConsumerWidget {
     // Watch auth state to trigger router refresh when state changes
     ref.watch(authProvider);
 
+    // Watch theme mode from provider
+    final themeMode = ref.watch(flutterThemeModeProvider);
+
     return MaterialApp.router(
       title: 'Flutter Auth Demo',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: _createRouter(ref),
       debugShowCheckedModeBanner: false,
     );

@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/errors/failures.dart';
+import '../../design_system/tokens/tokens.dart';
+import '../../design_system/tokens/typography.dart';
+import '../../design_system/utils/theme_colors.dart';
 import '../../domain/entities/user.dart';
 import '../providers/auth_provider.dart';
 import '../providers/user_list_provider.dart';
@@ -67,7 +70,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
         ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DSTokens.radiusS),
+        ),
       ),
     );
   }
@@ -84,7 +89,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DSTokens.radiusS),
+        ),
         duration: const Duration(seconds: 4),
       ),
     );
@@ -103,12 +110,18 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
     final result = await showDialog<UserStatus?>(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: ref.colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DSTokens.radiusL),
+        ),
         title: Row(
           children: [
             Icon(Icons.verified_user, color: Colors.blue.shade700),
             const SizedBox(width: 8),
-            Text('Update ${user.name}\'s Status'),
+            Text(
+              'Update ${user.name}\'s Status',
+              style: TextStyle(color: ref.colors.textPrimary),
+            ),
           ],
         ),
         content: Column(
@@ -116,10 +129,10 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(DSTokens.spaceM),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
+                color: ref.colors.surfaceContainer,
+                borderRadius: BorderRadius.circular(DSTokens.radiusS),
               ),
               child: Row(
                 children: [
@@ -128,23 +141,29 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     color: Colors.blue.shade700,
                     size: 20,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: DSTokens.spaceS),
                   Text(
                     'Current status: ${user.status.value.toUpperCase()}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: ref.colors.textPrimary,
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Select new status:',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: ref.colors.textPrimary,
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               '• Verified: Full app access\n• Unverified: Limited access\n• Suspended: Account disabled',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: ref.colors.textSecondary),
             ),
           ],
         ),
@@ -216,12 +235,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
     final result = await showDialog<UserRole?>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: ref.colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(Icons.admin_panel_settings, color: Colors.purple.shade700),
             const SizedBox(width: 8),
-            Text('Update ${user.name}\'s Role'),
+            Text(
+              'Update ${user.name}\'s Role',
+              style: TextStyle(color: ref.colors.textPrimary),
+            ),
           ],
         ),
         content: Column(
@@ -231,7 +254,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: ref.colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -244,20 +267,26 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'Current role: ${user.role.value.toUpperCase()}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: ref.colors.textPrimary,
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Select new role:',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: ref.colors.textPrimary,
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               '• Admin: Full system access\n• Moderator: Can verify users\n• User: Basic access only',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: ref.colors.textSecondary),
             ),
           ],
         ),
@@ -270,8 +299,8 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
             ElevatedButton.icon(
               onPressed: () => Navigator.of(context).pop(UserRole.user),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade600,
-                foregroundColor: Colors.white,
+                backgroundColor: ref.colors.surfaceContainer,
+                foregroundColor: ref.colors.textPrimary,
               ),
               icon: const Icon(Icons.person, size: 18),
               label: const Text('User'),
@@ -335,6 +364,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          backgroundColor: ref.colors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -342,7 +372,10 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
             children: [
               Icon(Icons.person_add, color: Colors.green.shade700),
               const SizedBox(width: 8),
-              const Text('Add New User'),
+              Text(
+                'Add New User',
+                style: TextStyle(color: ref.colors.textPrimary),
+              ),
             ],
           ),
           content: Form(
@@ -356,9 +389,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: ref.colors.surfaceContainer,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade200),
+                      border: Border.all(color: ref.colors.border),
                     ),
                     child: Row(
                       children: [
@@ -368,10 +401,13 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           size: 20,
                         ),
                         const SizedBox(width: 8),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'New user will receive login credentials via email',
-                            style: TextStyle(fontSize: 12),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: ref.colors.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -384,12 +420,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     controller: nameController,
                     decoration: InputDecoration(
                       labelText: 'Full Name',
-                      prefixIcon: const Icon(Icons.person_outline),
+                      labelStyle: TextStyle(color: ref.colors.textSecondary),
+                      prefixIcon: Icon(
+                        Icons.person_outline,
+                        color: ref.colors.textSecondary,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ref.colors.border),
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: ref.colors.surfaceContainer,
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -408,12 +449,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     controller: emailController,
                     decoration: InputDecoration(
                       labelText: 'Email Address',
-                      prefixIcon: const Icon(Icons.email_outlined),
+                      labelStyle: TextStyle(color: ref.colors.textSecondary),
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                        color: ref.colors.textSecondary,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ref.colors.border),
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: ref.colors.surfaceContainer,
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
@@ -433,7 +479,11 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     controller: passwordController,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      labelStyle: TextStyle(color: ref.colors.textSecondary),
+                      prefixIcon: Icon(
+                        Icons.lock_outline,
+                        color: ref.colors.textSecondary,
+                      ),
                       suffixIcon: IconButton(
                         onPressed: () => setState(
                           () => isPasswordVisible = !isPasswordVisible,
@@ -442,14 +492,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           isPasswordVisible
                               ? Icons.visibility_off
                               : Icons.visibility,
+                          color: ref.colors.textSecondary,
                         ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ref.colors.border),
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: ref.colors.surfaceContainer,
                       helperText: 'Minimum 6 characters',
+                      helperStyle: TextStyle(color: ref.colors.textSecondary),
                     ),
                     obscureText: !isPasswordVisible,
                     validator: (value) {
@@ -466,14 +519,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     initialValue: selectedRole,
                     decoration: InputDecoration(
                       labelText: 'User Role',
-                      prefixIcon: const Icon(
+                      labelStyle: TextStyle(color: ref.colors.textSecondary),
+                      prefixIcon: Icon(
                         Icons.admin_panel_settings_outlined,
+                        color: ref.colors.textSecondary,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ref.colors.border),
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: ref.colors.surfaceContainer,
                     ),
                     items: UserRole.values.map((role) {
                       return DropdownMenuItem(
@@ -508,12 +564,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     initialValue: selectedStatus,
                     decoration: InputDecoration(
                       labelText: 'Account Status',
-                      prefixIcon: const Icon(Icons.verified_user_outlined),
+                      labelStyle: TextStyle(color: ref.colors.textSecondary),
+                      prefixIcon: Icon(
+                        Icons.verified_user_outlined,
+                        color: ref.colors.textSecondary,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ref.colors.border),
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: ref.colors.surfaceContainer,
                     ),
                     items: UserStatus.values.map((status) {
                       return DropdownMenuItem(
@@ -616,12 +677,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        backgroundColor: ref.colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(Icons.edit, color: Colors.blue.shade700),
             const SizedBox(width: 8),
-            Text('Edit ${user.name}'),
+            Text(
+              'Edit ${user.name}',
+              style: TextStyle(color: ref.colors.textPrimary),
+            ),
           ],
         ),
         content: Form(
@@ -635,9 +700,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: ref.colors.surfaceContainer,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: ref.colors.border),
                   ),
                   child: Row(
                     children: [
@@ -662,8 +727,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           children: [
                             Text(
                               user.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
+                                color: ref.colors.textPrimary,
                               ),
                             ),
                             Text(
@@ -694,14 +760,19 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                 // Name field
                 TextFormField(
                   controller: nameController,
+                  style: TextStyle(color: ref.colors.textPrimary),
                   decoration: InputDecoration(
                     labelText: 'Full Name',
-                    prefixIcon: const Icon(Icons.person_outline),
+                    labelStyle: TextStyle(color: ref.colors.textSecondary),
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: ref.colors.textSecondary,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey.shade50,
+                    fillColor: ref.colors.surfaceContainer,
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -718,15 +789,24 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                 // Email field (read-only)
                 TextFormField(
                   controller: emailController,
+                  style: TextStyle(color: ref.colors.textSecondary),
                   decoration: InputDecoration(
                     labelText: 'Email Address',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    suffixIcon: const Icon(Icons.lock_outline, size: 18),
+                    labelStyle: TextStyle(color: ref.colors.textSecondary),
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: ref.colors.textSecondary,
+                    ),
+                    suffixIcon: Icon(
+                      Icons.lock_outline,
+                      size: 18,
+                      color: ref.colors.textSecondary,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey.shade100,
+                    fillColor: ref.colors.surfaceContainer,
                   ),
                   keyboardType: TextInputType.emailAddress,
                   enabled: false, // Email can't be changed in Firebase Auth
@@ -737,7 +817,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: Colors.orange.shade50.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.orange.shade200),
                   ),
@@ -749,10 +829,13 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Email address cannot be modified due to Firebase authentication constraints',
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: ref.colors.textPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -823,12 +906,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: ref.colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(Icons.person, color: Colors.blue.shade700),
             const SizedBox(width: 8),
-            const Text('User Details'),
+            Text(
+              'User Details',
+              style: TextStyle(color: ref.colors.textPrimary),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -870,9 +957,10 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     const SizedBox(height: 12),
                     Text(
                       user.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: ref.colors.textPrimary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -881,7 +969,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                       user.email,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: ref.colors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -942,9 +1030,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: ref.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: ref.colors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -957,16 +1045,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Account Information',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            color: ref.colors.textPrimary,
                           ),
                         ),
                       ],
                     ),
-                    const Divider(),
+                    Divider(color: ref.colors.border),
                     _buildDetailRow('User ID', user.uid),
                     const SizedBox(height: 8),
                     _buildDetailRow('Email', user.email),
@@ -997,9 +1086,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: ref.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade200),
+                  border: Border.all(color: ref.colors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1012,16 +1101,17 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Permissions & Capabilities',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            color: ref.colors.textPrimary,
                           ),
                         ),
                       ],
                     ),
-                    const Divider(),
+                    Divider(color: ref.colors.border),
                     _buildPermissionChip(
                       'Can verify users',
                       user.canVerifyUsers,
@@ -1063,10 +1153,18 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
           width: 80,
           child: Text(
             '$label:',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: ref.colors.textPrimary,
+            ),
           ),
         ),
-        Expanded(child: SelectableText(value)),
+        Expanded(
+          child: SelectableText(
+            value,
+            style: TextStyle(color: ref.colors.textPrimary),
+          ),
+        ),
       ],
     );
   }
@@ -1077,7 +1175,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: hasPermission ? Colors.green.shade100 : Colors.red.shade100,
+          color: hasPermission
+              ? Colors.green.shade100.withValues(alpha: 0.5)
+              : Colors.red.shade100.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: hasPermission ? Colors.green.shade300 : Colors.red.shade300,
@@ -1136,12 +1236,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        backgroundColor: ref.colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(Icons.warning, color: Colors.red.shade700),
             const SizedBox(width: 8),
-            const Text('Delete User'),
+            Text(
+              'Delete User',
+              style: TextStyle(color: ref.colors.textPrimary),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -1153,7 +1257,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: Colors.red.shade50.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.red.shade200),
                 ),
@@ -1178,15 +1282,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                         children: [
                           Text(
                             user.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
+                              color: ref.colors.textPrimary,
                             ),
                           ),
                           Text(
                             user.email,
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: ref.colors.textSecondary,
                               fontSize: 14,
                             ),
                           ),
@@ -1265,7 +1370,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade800,
+                  color: ref.colors.textPrimary,
                 ),
               ),
             ],
@@ -1311,19 +1416,22 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: DSTokens.spaceM,
+          vertical: DSTokens.spaceS,
+        ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3498DB) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? const Color(0xFF3498DB) : ref.colors.surface,
+          borderRadius: BorderRadius.circular(DSTokens.spaceL),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3498DB) : Colors.grey.shade300,
+            color: isSelected ? const Color(0xFF3498DB) : ref.colors.border,
             width: 1,
           ),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : const Color(0xFF2C3E50),
+          style: DSTypography.labelMedium.copyWith(
+            color: isSelected ? Colors.white : ref.colors.textPrimary,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
           ),
@@ -1360,22 +1468,23 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
     final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: ref.colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF2C3E50),
+        backgroundColor: ref.colors.surface,
+        foregroundColor: ref.colors.textPrimary,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
         ),
-        title: const Text(
+        title: Text(
           'Users',
-          style: TextStyle(
+          style: DSTypography.headlineMedium.copyWith(
             fontSize: 24,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.5,
+            color: ref.colors.textPrimary,
           ),
         ),
         actions: [
@@ -1406,8 +1515,8 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               icon: const Icon(Icons.refresh_rounded, size: 20),
               tooltip: 'Refresh',
               style: IconButton.styleFrom(
-                side: BorderSide(color: Colors.grey.shade300),
-                foregroundColor: const Color(0xFF2C3E50),
+                side: BorderSide(color: ref.colors.border),
+                foregroundColor: ref.colors.textPrimary,
               ),
             ),
           ),
@@ -1421,8 +1530,13 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                   context.go('/profile');
                 }
               },
-              icon: const Icon(Icons.more_vert_rounded, size: 20),
+              icon: Icon(
+                Icons.more_vert_rounded,
+                size: 20,
+                color: ref.colors.textPrimary,
+              ),
               surfaceTintColor: Colors.transparent,
+              color: ref.colors.surface,
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'profile',
@@ -1431,10 +1545,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                       Icon(
                         Icons.person_outline,
                         size: 18,
-                        color: Colors.grey.shade700,
+                        color: ref.colors.textSecondary,
                       ),
                       const SizedBox(width: 12),
-                      const Text('Profile', style: TextStyle(fontSize: 14)),
+                      Text(
+                        'Profile',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ref.colors.textPrimary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1445,10 +1565,16 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                       Icon(
                         Icons.logout_rounded,
                         size: 18,
-                        color: Colors.grey.shade700,
+                        color: ref.colors.textSecondary,
                       ),
                       const SizedBox(width: 12),
-                      const Text('Logout', style: TextStyle(fontSize: 14)),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ref.colors.textPrimary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1461,29 +1587,34 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
         children: [
           // Modern Search Section
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(
+              DSTokens.spaceL,
+              DSTokens.spaceL,
+              DSTokens.spaceL,
+              DSTokens.spaceM,
+            ),
+            color: ref.colors.surface,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Search bar
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    color: ref.colors.surfaceContainer,
+                    borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                    border: Border.all(color: ref.colors.border),
                   ),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search users...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
+                      hintStyle: DSTypography.bodyMedium.copyWith(
+                        color: ref.colors.textSecondary,
                         fontSize: 15,
                       ),
                       prefixIcon: Icon(
                         Icons.search_rounded,
-                        color: Colors.grey.shade400,
+                        color: ref.colors.textSecondary,
                         size: 20,
                       ),
                       suffixIcon: _searchQuery.isNotEmpty
@@ -1496,15 +1627,15 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                               },
                               icon: Icon(
                                 Icons.close_rounded,
-                                color: Colors.grey.shade400,
+                                color: ref.colors.textSecondary,
                                 size: 18,
                               ),
                             )
                           : null,
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
+                        horizontal: DSTokens.spaceM,
+                        vertical: DSTokens.spaceM,
                       ),
                     ),
                     enabled: !_isPerformingAction && !userListState.isLoading,
@@ -1515,7 +1646,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: DSTokens.spaceM),
                 // Minimal Filter Chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -1546,11 +1677,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                         () => setState(() => _roleFilter = UserRole.user),
                       ),
                       const SizedBox(width: 16),
-                      Container(
-                        height: 20,
-                        width: 1,
-                        color: Colors.grey.shade300,
-                      ),
+                      Container(height: 20, width: 1, color: ref.colors.border),
                       const SizedBox(width: 16),
                       // Status filters
                       _buildFilterChip(
@@ -1593,7 +1720,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              color: const Color(0xFFF8F9FA),
+              color: ref.colors.surfaceContainer,
               child: Row(
                 children: [
                   Container(
@@ -1612,10 +1739,10 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                   Expanded(
                     child: Text(
                       '${currentUser.name} • ${currentUser.role.value.toUpperCase()}',
-                      style: const TextStyle(
+                      style: DSTypography.bodyMedium.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF2C3E50),
+                        color: ref.colors.textPrimary,
                       ),
                     ),
                   ),
@@ -1626,14 +1753,14 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: ref.colors.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: ref.colors.border),
                       ),
                       child: Text(
                         '${_getFilteredUsers(userListState.users).length}',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
+                        style: DSTypography.labelMedium.copyWith(
+                          color: ref.colors.textSecondary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1664,7 +1791,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                   Expanded(
                     child: Text(
                       userListState.error!,
-                      style: TextStyle(
+                      style: DSTypography.bodyMedium.copyWith(
                         color: Colors.red.shade800,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -1703,7 +1830,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                   width: 80,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
+                                    color: ref.colors.surfaceContainer,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Icon(
@@ -1711,7 +1838,7 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                         ? Icons.people_outline_rounded
                                         : Icons.search_off_rounded,
                                     size: 40,
-                                    color: Colors.grey.shade400,
+                                    color: ref.colors.textSecondary,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -1719,10 +1846,10 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                   userListState.users.isEmpty
                                       ? 'No users yet'
                                       : 'No matching users',
-                                  style: const TextStyle(
+                                  style: DSTypography.headlineSmall.copyWith(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF2C3E50),
+                                    color: ref.colors.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -1730,9 +1857,9 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                   userListState.users.isEmpty
                                       ? 'Users will appear here once they\'re added'
                                       : 'Try adjusting your search or filters',
-                                  style: TextStyle(
+                                  style: DSTypography.bodyMedium.copyWith(
                                     fontSize: 14,
-                                    color: Colors.grey.shade600,
+                                    color: ref.colors.textSecondary,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -1770,12 +1897,12 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                           return Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: ref.colors.surface,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade200),
+                              border: Border.all(color: ref.colors.border),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.shade100,
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -1820,18 +1947,18 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                     children: [
                                       Text(
                                         user.name,
-                                        style: const TextStyle(
+                                        style: DSTypography.bodyLarge.copyWith(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          color: Color(0xFF2C3E50),
+                                          color: ref.colors.textPrimary,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         user.email,
-                                        style: TextStyle(
+                                        style: DSTypography.bodyMedium.copyWith(
                                           fontSize: 14,
-                                          color: Colors.grey.shade600,
+                                          color: ref.colors.textSecondary,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
@@ -1910,10 +2037,11 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                 PopupMenuButton<String>(
                                   icon: Icon(
                                     Icons.more_vert_rounded,
-                                    color: Colors.grey.shade400,
+                                    color: ref.colors.textSecondary,
                                     size: 20,
                                   ),
                                   surfaceTintColor: Colors.transparent,
+                                  color: ref.colors.surface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -1944,12 +2072,15 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                           Icon(
                                             Icons.info_outline_rounded,
                                             size: 18,
-                                            color: Colors.grey.shade700,
+                                            color: ref.colors.textSecondary,
                                           ),
                                           const SizedBox(width: 12),
-                                          const Text(
+                                          Text(
                                             'View Details',
-                                            style: TextStyle(fontSize: 14),
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: ref.colors.textPrimary,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -1963,12 +2094,15 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                             Icon(
                                               Icons.edit_outlined,
                                               size: 18,
-                                              color: Colors.grey.shade700,
+                                              color: ref.colors.textSecondary,
                                             ),
                                             const SizedBox(width: 12),
-                                            const Text(
+                                            Text(
                                               'Edit Profile',
-                                              style: TextStyle(fontSize: 14),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: ref.colors.textPrimary,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -1981,12 +2115,15 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                             Icon(
                                               Icons.verified_user_outlined,
                                               size: 18,
-                                              color: Colors.grey.shade700,
+                                              color: ref.colors.textSecondary,
                                             ),
                                             const SizedBox(width: 12),
-                                            const Text(
+                                            Text(
                                               'Update Status',
-                                              style: TextStyle(fontSize: 14),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: ref.colors.textPrimary,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -2000,12 +2137,15 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                                               Icons
                                                   .admin_panel_settings_outlined,
                                               size: 18,
-                                              color: Colors.grey.shade700,
+                                              color: ref.colors.textSecondary,
                                             ),
                                             const SizedBox(width: 12),
-                                            const Text(
+                                            Text(
                                               'Change Role',
-                                              style: TextStyle(fontSize: 14),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: ref.colors.textPrimary,
+                                              ),
                                             ),
                                           ],
                                         ),

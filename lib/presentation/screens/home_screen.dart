@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/errors/failures.dart';
+import '../../design_system/design_system.dart';
+import '../../domain/entities/user.dart';
 import '../providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -11,205 +14,54 @@ class HomeScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider);
 
     if (currentUser == null) {
-      return const Scaffold(body: Center(child: Text('Not authenticated')));
+      return Scaffold(
+        backgroundColor: ref.colors.background,
+        body: Center(
+          child: Text(
+            'Not authenticated',
+            style: TextStyle(color: ref.colors.textPrimary),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: ref.colors.background,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+        ),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: DSTokens.spaceL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main Greeting Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      _getRoleColor(currentUser.role),
-                      _getRoleColor(currentUser.role).withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _getRoleColor(
-                        currentUser.role,
-                      ).withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Greeting Text
-                    Text(
-                      _getGreeting(),
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
+              SizedBox(height: DSTokens.spaceL),
 
-                    const SizedBox(height: 8),
+              // Clean Header Section
+              _buildHeaderSection(currentUser, ref),
 
-                    // User Name
-                    Text(
-                      currentUser.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -1,
-                        height: 1.1,
-                      ),
-                    ),
+              SizedBox(height: DSTokens.spaceXXL),
 
-                    const SizedBox(height: 16),
+              // Modern Stats Grid
+              _buildStatsSection(currentUser, ref),
 
-                    // Welcome Message
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Welcome back to the app! 👋',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              SizedBox(height: DSTokens.spaceXXL),
 
-              const SizedBox(height: 32),
+              // Daily Inspiration
+              _buildInspirationSection(ref),
 
-              // Quick Stats Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Card Title
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: _getRoleColor(
-                              currentUser.role,
-                            ).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            _getRoleIcon(currentUser.role),
-                            color: _getRoleColor(currentUser.role),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Your Account',
-                          style: TextStyle(
-                            color: Color(0xFF1F2937),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Account Details
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatItem(
-                            'Role',
-                            currentUser.role.value.toUpperCase(),
-                            _getRoleColor(currentUser.role),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildStatItem(
-                            'Status',
-                            currentUser.status.value.toUpperCase(),
-                            _getStatusColor(currentUser.status),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-
-              // Bottom Quote Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1F2937),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.format_quote_rounded,
-                      color: Colors.white.withValues(alpha: 0.7),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _getInspirationalQuote(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.4,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
+              SizedBox(height: DSTokens.spaceL),
             ],
           ),
         ),
@@ -217,34 +69,178 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
+  Widget _buildHeaderSection(User currentUser, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Greeting
+        Text(
+          _getGreeting(),
+          style: DSTypography.bodyMedium.copyWith(
+            color: ref.colors.textSecondary,
+          ),
+        ),
+        SizedBox(height: DSTokens.spaceXS),
+
+        // Name
+        Text(
+          currentUser.name,
+          style: DSTypography.displayMedium.copyWith(
+            color: ref.colors.textPrimary,
+          ),
+        ),
+        SizedBox(height: DSTokens.spaceM),
+
+        // Role badge
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: DSTokens.spaceM,
+            vertical: DSTokens.spaceS,
+          ),
+          decoration: BoxDecoration(
+            color: _getRoleColor(currentUser.role).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(DSTokens.radiusCircle),
+            border: Border.all(
+              color: _getRoleColor(currentUser.role).withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _getRoleIcon(currentUser.role),
+                size: DSTokens.spaceM,
+                color: _getRoleColor(currentUser.role),
+              ),
+              SizedBox(width: DSTokens.spaceS),
+              Text(
+                currentUser.role.value.toUpperCase(),
+                style: DSTypography.labelSmall.copyWith(
+                  color: _getRoleColor(currentUser.role),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsSection(User currentUser, WidgetRef ref) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(DSTokens.spaceXL),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+        color: ref.colors.surface,
+        borderRadius: BorderRadius.circular(DSTokens.radiusXL),
+        border: Border.all(color: ref.colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Row(
+            children: [
+              Container(
+                width: DSTokens.spaceXS,
+                height: DSTokens.spaceXL,
+                decoration: BoxDecoration(
+                  color: _getRoleColor(currentUser.role),
+                  borderRadius: BorderRadius.circular(DSTokens.radiusXS),
+                ),
+              ),
+              SizedBox(width: DSTokens.spaceM),
+              Text(
+                'Account Status',
+                style: DSTypography.headlineMedium.copyWith(
+                  color: ref.colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: DSTokens.spaceL),
+
+          // Stats grid
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  'Status',
+                  currentUser.status.value.toUpperCase(),
+                  _getStatusColor(currentUser.status),
+                  ref,
+                ),
+              ),
+              SizedBox(width: DSTokens.spaceM),
+              Expanded(
+                child: _buildStatCard(
+                  'Joined',
+                  _formatDate(currentUser.createdAt),
+                  ref.colors.textSecondary,
+                  ref,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(
+    String label,
+    String value,
+    Color valueColor,
+    WidgetRef ref,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(DSTokens.spaceM),
+      decoration: BoxDecoration(
+        color: ref.colors.surfaceContainer,
+        borderRadius: BorderRadius.circular(DSTokens.radiusM),
+        border: Border.all(color: ref.colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.3,
+            style: DSTypography.labelMedium.copyWith(
+              color: ref.colors.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: DSTokens.spaceS),
           Text(
             value,
-            style: TextStyle(
-              color: color,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
+            style: DSTypography.labelLarge.copyWith(color: valueColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInspirationSection(WidgetRef ref) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(DSTokens.spaceXL),
+      decoration: BoxDecoration(
+        color: ref.colors.surface,
+        borderRadius: BorderRadius.circular(DSTokens.radiusL),
+        border: Border.all(color: ref.colors.border),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.lightbulb_outline_rounded,
+            color: ref.colors.textSecondary,
+            size: DSTokens.spaceXL,
+          ),
+          SizedBox(height: DSTokens.spaceM),
+          Text(
+            _getInspirationalQuote(),
+            textAlign: TextAlign.center,
+            style: DSTypography.bodyMedium.copyWith(
+              color: ref.colors.textPrimary,
+              fontStyle: FontStyle.italic,
             ),
           ),
         ],
@@ -263,6 +259,24 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.year}';
+  }
+
   String _getInspirationalQuote() {
     final quotes = [
       'Success is not final, failure is not fatal: it is the courage to continue that counts.',
@@ -270,6 +284,7 @@ class HomeScreen extends ConsumerWidget {
       'Innovation distinguishes between a leader and a follower.',
       'Your limitation—it\'s only your imagination.',
       'Dream it. Wish it. Do it.',
+      'Stay focused and never give up.',
     ];
 
     final index = DateTime.now().day % quotes.length;
@@ -279,11 +294,11 @@ class HomeScreen extends ConsumerWidget {
   Color _getRoleColor(UserRole role) {
     switch (role) {
       case UserRole.admin:
-        return const Color(0xFFDC2626); // Red
+        return const Color(0xFF8B5CF6); // Modern purple
       case UserRole.moderator:
-        return const Color(0xFF7C3AED); // Purple
+        return const Color(0xFF3B82F6); // Modern blue
       case UserRole.user:
-        return const Color(0xFF059669); // Green
+        return const Color(0xFF6B7280); // Modern gray
     }
   }
 
@@ -301,11 +316,11 @@ class HomeScreen extends ConsumerWidget {
   Color _getStatusColor(UserStatus status) {
     switch (status) {
       case UserStatus.verified:
-        return const Color(0xFF059669); // Green
+        return const Color(0xFF10B981); // Modern green
       case UserStatus.unverified:
-        return const Color(0xFFD97706); // Orange
+        return const Color(0xFFF59E0B); // Modern amber
       case UserStatus.suspended:
-        return const Color(0xFFDC2626); // Red
+        return const Color(0xFFEF4444); // Modern red
     }
   }
 }

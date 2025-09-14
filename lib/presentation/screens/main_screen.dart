@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/errors/failures.dart';
+import '../../design_system/utils/theme_colors.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/role_gate.dart';
 import '../widgets/status_gate.dart';
@@ -38,6 +39,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     List<Widget> navItems = [
       _buildNavItem(
         context: context,
+        ref: ref,
         index: 0,
         icon: Icons.home_rounded,
         activeIcon: Icons.home_rounded,
@@ -48,6 +50,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       if (currentUser.canViewAllUsers)
         _buildNavItem(
           context: context,
+          ref: ref,
           index: 1,
           icon: Icons.people_outline_rounded,
           activeIcon: Icons.people_rounded,
@@ -57,6 +60,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ),
       _buildNavItem(
         context: context,
+        ref: ref,
         index: currentUser.canViewAllUsers ? 2 : 1,
         icon: Icons.person_outline_rounded,
         activeIcon: Icons.person_rounded,
@@ -70,10 +74,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       body: IndexedStack(index: _selectedIndex, children: screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: ref.colors.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: ref.colors.textPrimary.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, -8),
             ),
@@ -95,6 +99,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   Widget _buildNavItem({
     required BuildContext context,
+    required WidgetRef ref,
     required int index,
     required IconData icon,
     required IconData activeIcon,
@@ -125,7 +130,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 child: Icon(
                   isSelected ? activeIcon : icon,
                   key: ValueKey(isSelected),
-                  color: isSelected ? roleColor : const Color(0xFF6B7280),
+                  color: isSelected ? roleColor : ref.colors.textSecondary,
                   size: 22,
                 ),
               ),
@@ -138,7 +143,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? roleColor : const Color(0xFF6B7280),
+                  color: isSelected ? roleColor : ref.colors.textSecondary,
                   letterSpacing: 0.1,
                 ),
                 child: Text(label),
