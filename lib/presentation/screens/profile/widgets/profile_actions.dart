@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
+import '../../../../design_system/utils/theme_colors.dart';
+import '../../../../design_system/providers/theme_provider.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
 import 'theme_mode_selector.dart';
 
+/// Enhanced ProfileActions with senior UX principles:
+/// 1. Better information architecture with logical grouping
+/// 2. Enhanced accessibility and usability
+/// 3. Optimized dark mode support
+/// 4. Micro-interactions for better feedback
+/// 5. Mobile-first responsive design
 class ProfileActions extends ConsumerStatefulWidget {
   final User currentUser;
 
@@ -15,8 +24,30 @@ class ProfileActions extends ConsumerStatefulWidget {
   ConsumerState<ProfileActions> createState() => _ProfileActionsState();
 }
 
-class _ProfileActionsState extends ConsumerState<ProfileActions> {
+class _ProfileActionsState extends ConsumerState<ProfileActions>
+    with TickerProviderStateMixin {
   bool _notificationsEnabled = true; // TODO: Get from settings
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   Color _getRoleColor(UserRole role) {
     switch (role) {
@@ -30,35 +61,70 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
   }
 
   void _showAboutDialog() {
+    final isDark = ref.watch(isDarkModeProvider);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: ref.colors.surface,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DSTokens.radiusL),
         ),
-        title: Text(
-          'About Application',
-          style: DSTypography.headlineSmall.copyWith(
-            color: ref.colors.textPrimary,
-            fontWeight: DSTokens.fontWeightBold,
-          ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(DSTokens.spaceS),
+              decoration: BoxDecoration(
+                color: DSColors.info.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(DSTokens.radiusM),
+              ),
+              child: Icon(
+                Icons.info_outline_rounded,
+                color: DSColors.info,
+                size: DSTokens.fontL,
+              ),
+            ),
+            const SizedBox(width: DSTokens.spaceM),
+            Text(
+              'About Application',
+              style: DSTypography.headlineSmall.copyWith(
+                color: ref.colors.textPrimary,
+                fontWeight: DSTokens.fontWeightBold,
+              ),
+            ),
+          ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Version: 1.0.0',
-              style: DSTypography.bodyMedium.copyWith(
-                color: ref.colors.textSecondary,
-              ),
+            _buildInfoRow(
+              label: 'Version',
+              value: '1.0.0',
+              icon: Icons.tag_rounded,
             ),
             const SizedBox(height: DSTokens.spaceS),
-            Text(
-              'A modern profile management application built with Flutter and Firebase.',
-              style: DSTypography.bodyMedium.copyWith(
-                color: ref.colors.textPrimary,
+            _buildInfoRow(
+              label: 'Build',
+              value:
+                  '${DateTime.now().year}.${DateTime.now().month}.${DateTime.now().day}',
+              icon: Icons.build_rounded,
+            ),
+            const SizedBox(height: DSTokens.spaceM),
+            Container(
+              padding: const EdgeInsets.all(DSTokens.spaceM),
+              decoration: BoxDecoration(
+                color: isDark ? ref.colors.surfaceElevated : DSColors.neutral50,
+                borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                border: Border.all(color: ref.colors.border, width: 1),
+              ),
+              child: Text(
+                'A modern profile management application built with Flutter and Firebase, designed with accessibility and user experience in mind.',
+                style: DSTypography.bodyMedium.copyWith(
+                  color: ref.colors.textPrimary,
+                  height: 1.5,
+                ),
               ),
             ),
           ],
@@ -67,12 +133,51 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(
-              foregroundColor: _getRoleColor(widget.currentUser.role),
+              foregroundColor: ref.colors.textSecondary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DSTokens.spaceL,
+                vertical: DSTokens.spaceM,
+              ),
             ),
-            child: Text('Close', style: DSTypography.buttonMedium),
+            child: Text(
+              'Close',
+              style: DSTypography.buttonMedium.copyWith(
+                fontWeight: DSTokens.fontWeightMedium,
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required String label,
+    required String value,
+    required IconData icon,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: DSTokens.fontM, color: ref.colors.textTertiary),
+        const SizedBox(width: DSTokens.spaceS),
+        Text(
+          '$label:',
+          style: DSTypography.bodyMedium.copyWith(
+            color: ref.colors.textSecondary,
+            fontWeight: DSTokens.fontWeightMedium,
+          ),
+        ),
+        const SizedBox(width: DSTokens.spaceS),
+        Expanded(
+          child: Text(
+            value,
+            style: DSTypography.bodyMedium.copyWith(
+              color: ref.colors.textPrimary,
+              fontWeight: DSTokens.fontWeightSemiBold,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -81,30 +186,95 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: ref.colors.surface,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DSTokens.radiusL),
         ),
-        title: Text(
-          'Logout',
-          style: DSTypography.headlineSmall.copyWith(
-            color: DSColors.error,
-            fontWeight: DSTokens.fontWeightBold,
-          ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(DSTokens.spaceS),
+              decoration: BoxDecoration(
+                color: DSColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(DSTokens.radiusM),
+              ),
+              child: Icon(
+                Icons.logout_rounded,
+                color: DSColors.error,
+                size: DSTokens.fontL,
+              ),
+            ),
+            const SizedBox(width: DSTokens.spaceM),
+            Text(
+              'Logout Confirmation',
+              style: DSTypography.headlineSmall.copyWith(
+                color: DSColors.error,
+                fontWeight: DSTokens.fontWeightBold,
+              ),
+            ),
+          ],
         ),
-        content: Text(
-          'Are you sure you want to logout from your account?',
-          style: DSTypography.bodyMedium.copyWith(
-            color: ref.colors.textPrimary,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Are you sure you want to logout from your account?',
+              style: DSTypography.bodyLarge.copyWith(
+                color: ref.colors.textPrimary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: DSTokens.spaceS),
+            Container(
+              padding: const EdgeInsets.all(DSTokens.spaceM),
+              decoration: BoxDecoration(
+                color: DSColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                border: Border.all(
+                  color: DSColors.warning.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: DSColors.warning,
+                    size: DSTokens.fontM,
+                  ),
+                  const SizedBox(width: DSTokens.spaceS),
+                  Expanded(
+                    child: Text(
+                      'You will need to sign in again to access your account.',
+                      style: DSTypography.bodySmall.copyWith(
+                        color: DSColors.warning,
+                        fontWeight: DSTokens.fontWeightMedium,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(
-              foregroundColor: DSColors.textSecondary,
+              foregroundColor: ref.colors.textSecondary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DSTokens.spaceL,
+                vertical: DSTokens.spaceM,
+              ),
             ),
-            child: Text('Cancel', style: DSTypography.buttonMedium),
+            child: Text(
+              'Cancel',
+              style: DSTypography.buttonMedium.copyWith(
+                fontWeight: DSTokens.fontWeightMedium,
+              ),
+            ),
           ),
+          const SizedBox(width: DSTokens.spaceS),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -114,11 +284,27 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
               backgroundColor: DSColors.error,
               foregroundColor: DSColors.textOnColor,
               elevation: 0,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DSTokens.spaceL,
+                vertical: DSTokens.spaceM,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DSTokens.radiusM),
               ),
             ),
-            child: Text('Logout', style: DSTypography.buttonMedium),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.logout_rounded, size: DSTokens.fontM),
+                const SizedBox(width: DSTokens.spaceS),
+                Text(
+                  'Logout',
+                  style: DSTypography.buttonMedium.copyWith(
+                    fontWeight: DSTokens.fontWeightSemiBold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -130,120 +316,261 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
       _notificationsEnabled = value;
     });
 
-    // Show feedback
+    // Enhanced feedback with haptic
+    if (value) {
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.selectionClick();
+    }
+
+    // Improved snackbar feedback
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          'Notifications ${value ? 'enabled' : 'disabled'}',
-          style: DSTypography.bodyMedium.copyWith(color: DSColors.textOnColor),
+        content: Row(
+          children: [
+            Icon(
+              value
+                  ? Icons.notifications_active_rounded
+                  : Icons.notifications_off_rounded,
+              color: DSColors.textOnColor,
+              size: DSTokens.fontM,
+            ),
+            const SizedBox(width: DSTokens.spaceS),
+            Text(
+              'Notifications ${value ? 'enabled' : 'disabled'}',
+              style: DSTypography.bodyMedium.copyWith(
+                color: DSColors.textOnColor,
+                fontWeight: DSTokens.fontWeightMedium,
+              ),
+            ),
+          ],
         ),
-        backgroundColor: _getRoleColor(widget.currentUser.role),
+        backgroundColor: value ? DSColors.success : DSColors.warning,
         behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(DSTokens.spaceM),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DSTokens.radiusM),
         ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showManageUsersInfo() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              color: DSColors.textOnColor,
+              size: DSTokens.fontM,
+            ),
+            const SizedBox(width: DSTokens.spaceS),
+            Expanded(
+              child: Text(
+                'Users management is available in the Users tab at the bottom navigation',
+                style: DSTypography.bodyMedium.copyWith(
+                  color: DSColors.textOnColor,
+                  fontWeight: DSTokens.fontWeightMedium,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: DSColors.info,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(DSTokens.spaceM),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DSTokens.radiusM),
+        ),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: ref.colors.surface,
-        borderRadius: BorderRadius.circular(DSTokens.radiusL),
-        boxShadow: [DSTokens.shadowS],
-      ),
-      child: Column(
-        children: [
-          // Show Manage Users only for users who can view all users
-          if (widget.currentUser.canViewAllUsers) ...[
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: ref.colors.surface,
+          borderRadius: BorderRadius.circular(DSTokens.radiusL),
+          // Cleaner approach: Remove border for minimal appearance
+          boxShadow: [
+            BoxShadow(
+              color: ref.colors.shadowColor.withValues(alpha: 0.15),
+              blurRadius: DSTokens.spaceXS,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Settings Section
+            _buildSectionHeader('Settings', Icons.settings_rounded),
+
             _buildMenuTile(
-              icon: Icons.people_outline_rounded,
-              title: 'Manage Users',
-              subtitle: 'Available in Users tab below',
+              icon: Icons.notifications_outlined,
+              title: 'Push Notifications',
+              subtitle: 'Receive updates and alerts',
+              trailing: Switch.adaptive(
+                value: _notificationsEnabled,
+                onChanged: _toggleNotifications,
+                activeColor: _getRoleColor(widget.currentUser.role),
+                activeTrackColor: _getRoleColor(
+                  widget.currentUser.role,
+                ).withValues(alpha: 0.3),
+                inactiveThumbColor: ref.colors.textTertiary,
+                inactiveTrackColor: ref.colors.surfaceContainer,
+              ),
+              onTap: null, // Switch handles the interaction
+            ),
+
+            const SizedBox(height: DSTokens.spaceS),
+
+            // Theme Selection
+            ThemeModeSelector(currentUser: widget.currentUser),
+
+            _buildSectionDivider(),
+
+            // Admin Section (Conditional)
+            if (widget.currentUser.canViewAllUsers) ...[
+              _buildSectionHeader(
+                'Administration',
+                Icons.admin_panel_settings_rounded,
+              ),
+
+              _buildMenuTile(
+                icon: Icons.people_outline_rounded,
+                title: 'Manage Users',
+                subtitle: 'Available in Users tab below',
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DSTokens.spaceS,
+                    vertical: DSTokens.spaceXS,
+                  ),
+                  decoration: BoxDecoration(
+                    color: DSColors.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(DSTokens.radiusS),
+                    border: Border.all(
+                      color: DSColors.info.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'Users Tab',
+                    style: DSTypography.labelSmall.copyWith(
+                      color: DSColors.info,
+                      fontWeight: DSTokens.fontWeightMedium,
+                    ),
+                  ),
+                ),
+                onTap: _showManageUsersInfo,
+              ),
+
+              _buildSectionDivider(),
+            ],
+
+            // Information Section
+            _buildSectionHeader('Information', Icons.info_rounded),
+
+            _buildMenuTile(
+              icon: Icons.info_outline_rounded,
+              title: 'About Application',
+              subtitle: 'Version and app information',
               trailing: Icon(
-                Icons.info_outline_rounded,
+                Icons.chevron_right_rounded,
                 color: ref.colors.textTertiary,
                 size: DSTokens.fontL,
               ),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Users management is available in the Users tab at the bottom',
-                      style: DSTypography.bodyMedium.copyWith(
-                        color: DSColors.textOnColor,
-                      ),
-                    ),
-                    backgroundColor: DSColors.info,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(DSTokens.radiusM),
-                    ),
-                  ),
-                );
-              },
+              onTap: _showAboutDialog,
             ),
 
-            _buildDivider(),
+            _buildSectionDivider(),
+
+            // Account Section
+            _buildSectionHeader(
+              'Account',
+              Icons.person_rounded,
+              isDestructive: true,
+            ),
+
+            _buildMenuTile(
+              icon: Icons.logout_rounded,
+              title: 'Logout',
+              subtitle: 'Sign out from your account',
+              trailing: Container(
+                padding: const EdgeInsets.all(DSTokens.spaceXS),
+                decoration: BoxDecoration(
+                  color: DSColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(DSTokens.radiusS),
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: DSColors.error,
+                  size: DSTokens.fontM,
+                ),
+              ),
+              onTap: _showLogoutConfirmation,
+              isDestructive: true,
+            ),
+
+            const SizedBox(height: DSTokens.spaceS),
           ],
+        ),
+      ),
+    );
+  }
 
-          // Settings
-          _buildMenuTile(
-            icon: Icons.notifications_outlined,
-            title: 'Push Notifications',
-            subtitle: 'Manage notification preferences',
-            trailing: Switch(
-              value: _notificationsEnabled,
-              onChanged: _toggleNotifications,
-              activeThumbColor: _getRoleColor(widget.currentUser.role),
-              activeTrackColor: _getRoleColor(
-                widget.currentUser.role,
-              ).withValues(alpha: 0.3),
-              inactiveThumbColor: DSColors.interactiveDisabled,
-              inactiveTrackColor: DSColors.surfaceContainer,
-            ),
-            onTap: null, // No tap action for switch items
+  Widget _buildSectionHeader(
+    String title,
+    IconData icon, {
+    bool isDestructive = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        DSTokens.spaceL,
+        DSTokens.spaceL,
+        DSTokens.spaceL,
+        DSTokens.spaceS,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: DSTokens.fontM,
+            color: isDestructive ? DSColors.error : ref.colors.textSecondary,
           ),
-
-          _buildDivider(),
-
-          // Theme Mode Selection
-          ThemeModeSelector(currentUser: widget.currentUser),
-
-          _buildDivider(),
-
-          // Information
-          _buildMenuTile(
-            icon: Icons.info_outline_rounded,
-            title: 'About Application',
-            subtitle: 'App version and information',
-            trailing: Icon(
-              Icons.chevron_right_rounded,
-              color: ref.colors.textTertiary,
-              size: DSTokens.fontL,
+          const SizedBox(width: DSTokens.spaceS),
+          Text(
+            title,
+            style: DSTypography.labelLarge.copyWith(
+              color: isDestructive ? DSColors.error : ref.colors.textSecondary,
+              fontWeight: DSTokens.fontWeightBold,
+              letterSpacing: 0.5,
             ),
-            onTap: _showAboutDialog,
-          ),
-
-          _buildDivider(),
-
-          // Logout
-          _buildMenuTile(
-            icon: Icons.logout_rounded,
-            title: 'Logout',
-            subtitle: 'Sign out from your account',
-            trailing: Icon(
-              Icons.chevron_right_rounded,
-              color: ref.colors.textTertiary,
-              size: DSTokens.fontL,
-            ),
-            onTap: _showLogoutConfirmation,
-            isDestructive: true,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionDivider() {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: DSTokens.spaceL,
+        vertical: DSTokens.spaceM,
+      ),
+      height: 1,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.transparent, ref.colors.border, Colors.transparent],
+          stops: const [0.0, 0.5, 1.0],
+        ),
       ),
     );
   }
@@ -260,11 +587,11 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
     final titleColor = isDestructive ? DSColors.error : ref.colors.textPrimary;
 
     return Material(
-      color: DSColors.transparent,
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(DSTokens.radiusM),
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: DSTokens.spaceL,
             vertical: DSTokens.spaceM,
@@ -272,20 +599,16 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(
-                  DSTokens.spaceS + DSTokens.spaceXS,
-                ), // 10px
+                padding: const EdgeInsets.all(DSTokens.spaceS),
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(
-                    DSTokens.spaceS + DSTokens.spaceXS,
-                  ), // 10px
+                  borderRadius: BorderRadius.circular(DSTokens.spaceS),
+                  border: Border.all(
+                    color: iconColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: DSTokens.fontL + DSTokens.spaceXS, // 22px
-                ),
+                child: Icon(icon, color: iconColor, size: DSTokens.fontL),
               ),
               const SizedBox(width: DSTokens.spaceM),
               Expanded(
@@ -297,15 +620,16 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
                       style: DSTypography.bodyLarge.copyWith(
                         color: titleColor,
                         fontWeight: DSTokens.fontWeightSemiBold,
-                        letterSpacing: -0.3,
+                        letterSpacing: -0.2,
                       ),
                     ),
-                    const SizedBox(height: DSTokens.spaceXS / 2), // 2px
+                    const SizedBox(height: DSTokens.spaceXS / 2),
                     Text(
                       subtitle,
                       style: DSTypography.bodySmall.copyWith(
                         color: ref.colors.textSecondary,
-                        letterSpacing: -0.1,
+                        letterSpacing: 0,
+                        height: 1.3,
                       ),
                     ),
                   ],
@@ -317,14 +641,6 @@ class _ProfileActionsState extends ConsumerState<ProfileActions> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: DSTokens.spaceL),
-      height: DSTokens.spaceXXS / 2, // 1px
-      color: ref.colors.border,
     );
   }
 }

@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
+import '../../../../design_system/utils/theme_colors.dart';
+import '../../../../design_system/providers/theme_provider.dart';
 import '../../../../domain/entities/user.dart';
 
+/// Dark Mode Optimized ProfileHeader following senior UX principles:
+/// 1. Theme-aware colors for perfect dark mode support
+/// 2. Adaptive shadows and elevations
+/// 3. Enhanced contrast for both light/dark themes
+/// 4. Consistent visual hierarchy across themes
+/// 5. Mobile-optimized responsive design
 class ProfileHeader extends ConsumerWidget {
   final User currentUser;
   final VoidCallback? onTap;
@@ -54,321 +62,234 @@ class ProfileHeader extends ConsumerWidget {
     }
   }
 
+  // Build status indicator with dark mode support
+  Widget _buildStatusIndicator(WidgetRef ref) {
+    final isDark = ref.watch(isDarkModeProvider);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DSTokens.spaceS,
+        vertical: DSTokens.spaceXS,
+      ),
+      decoration: BoxDecoration(
+        // Dark mode: stronger alpha for better visibility
+        color: _getStatusColor(
+          currentUser.status,
+        ).withValues(alpha: isDark ? 0.2 : 0.1),
+        borderRadius: BorderRadius.circular(DSTokens.radiusS),
+        border: Border.all(
+          // Dark mode: stronger border for better definition
+          color: _getStatusColor(
+            currentUser.status,
+          ).withValues(alpha: isDark ? 0.5 : 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _getStatusIcon(currentUser.status),
+            size: DSTokens.fontS,
+            color: _getStatusColor(currentUser.status),
+          ),
+          const SizedBox(width: DSTokens.spaceXS),
+          Text(
+            currentUser.status.value,
+            style: DSTypography.labelSmall.copyWith(
+              color: _getStatusColor(currentUser.status),
+              fontWeight: DSTokens.fontWeightMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build role badge with dark mode optimization
+  Widget _buildRoleBadge(WidgetRef ref) {
+    final isDark = ref.watch(isDarkModeProvider);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DSTokens.spaceS,
+        vertical: DSTokens.spaceXS,
+      ),
+      decoration: BoxDecoration(
+        color: _getRoleColor(currentUser.role),
+        borderRadius: BorderRadius.circular(DSTokens.radiusS),
+        // Dark mode: Add subtle border for better definition
+        border: isDark
+            ? Border.all(
+                color: _getRoleColor(currentUser.role).withValues(alpha: 0.3),
+                width: 0.5,
+              )
+            : null,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _getRoleIcon(currentUser.role),
+            size: DSTokens.fontS,
+            color: DSColors.textOnColor,
+          ),
+          const SizedBox(width: DSTokens.spaceXS),
+          Text(
+            currentUser.role.value,
+            style: DSTypography.labelSmall.copyWith(
+              color: DSColors.textOnColor,
+              fontWeight: DSTokens.fontWeightMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Dark mode optimized avatar with adaptive styling
+  Widget _buildAvatar(WidgetRef ref) {
+    final isDark = ref.watch(isDarkModeProvider);
+
+    return Container(
+      width: DSTokens.spaceXXL * 1.5, // 60px - mobile-friendly
+      height: DSTokens.spaceXXL * 1.5,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        // Dark mode: Use theme-aware surface color
+        color: ref.colors.surface,
+        border: Border.all(
+          color: _getRoleColor(currentUser.role).withValues(
+            // Dark mode: stronger border for better visibility
+            alpha: isDark ? 0.4 : 0.2,
+          ),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            // Dark mode: Adjusted shadow for better depth perception
+            color: ref.colors.shadowColor,
+            blurRadius: DSTokens.spaceS,
+            offset: const Offset(0, DSTokens.spaceXS),
+          ),
+        ],
+      ),
+      child: CircleAvatar(
+        radius: DSTokens.spaceXL, // 32px
+        backgroundColor: _getRoleColor(currentUser.role).withValues(
+          // Dark mode: slightly stronger alpha for better contrast
+          alpha: isDark ? 0.15 : 0.1,
+        ),
+        child: Text(
+          currentUser.name.isNotEmpty ? currentUser.name[0].toUpperCase() : 'U',
+          style: DSTypography.headlineSmall.copyWith(
+            color: _getRoleColor(currentUser.role),
+            fontWeight: DSTokens.fontWeightBold,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Material(
-      color: DSColors.transparent,
-      borderRadius: BorderRadius.circular(DSTokens.radiusL),
+    final isDark = ref.watch(isDarkModeProvider);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DSTokens.radiusL),
+        border: Border.all(
+          // Dark mode: Use theme-aware border color
+          color: ref.colors.border,
+          width: 1,
+        ),
+        // Dark mode: Use theme-aware surface color
+        color: ref.colors.surface,
+        // Dark mode: Enhanced shadow for better card definition
+        boxShadow: [
+          BoxShadow(
+            color: ref.colors.shadowColor,
+            blurRadius: isDark ? DSTokens.spaceS : DSTokens.spaceXS,
+            offset: Offset(0, isDark ? DSTokens.spaceXS : DSTokens.spaceXS / 2),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(DSTokens.radiusL),
         child: Container(
           width: double.infinity,
+          padding: const EdgeInsets.all(DSTokens.spaceL),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                _getRoleColor(currentUser.role),
-                _getRoleColor(currentUser.role).withValues(alpha: 0.8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            // Dark mode: Remove gradient for better consistency
+            color: ref.colors.surface,
             borderRadius: BorderRadius.circular(DSTokens.radiusL),
-            boxShadow: [
-              DSTokens.shadowM,
-              BoxShadow(
-                color: _getRoleColor(currentUser.role).withValues(alpha: 0.3),
-                blurRadius: DSTokens.spaceM,
-                offset: const Offset(0, DSTokens.spaceXS),
-              ),
-            ],
           ),
-          child: Stack(
+          child: Column(
             children: [
-              // Decorative background elements
-              Positioned(
-                top: -DSTokens.spaceL,
-                right: -DSTokens.spaceL,
-                child: Container(
-                  width: DSTokens.spaceXXL + DSTokens.spaceM, // 64px
-                  height: DSTokens.spaceXXL + DSTokens.spaceM, // 64px
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: DSColors.textOnColor.withValues(alpha: 0.1),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -DSTokens.fontL, // -20px
-                left: -DSTokens.fontL, // -20px
-                child: Container(
-                  width: DSTokens.spaceXXL - DSTokens.spaceXS, // 60px
-                  height: DSTokens.spaceXXL - DSTokens.spaceXS, // 60px
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: DSColors.textOnColor.withValues(alpha: 0.05),
-                  ),
-                ),
-              ),
+              // Main profile info row
+              Row(
+                children: [
+                  _buildAvatar(ref),
+                  const SizedBox(width: DSTokens.spaceM),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Primary: User name with theme-aware colors
+                        Text(
+                          currentUser.name,
+                          style: DSTypography.headlineSmall.copyWith(
+                            fontWeight: DSTokens.fontWeightBold,
+                            // Dark mode: Use theme-aware primary text color
+                            color: ref.colors.textPrimary,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
 
-              // Main content
-              Padding(
-                padding: const EdgeInsets.all(DSTokens.spaceL),
-                child: Row(
-                  children: [
-                    // Avatar Section
-                    Container(
-                      width: DSTokens.spaceXXL * 2 + DSTokens.fontL, // 88px
-                      height: DSTokens.spaceXXL * 2 + DSTokens.fontL, // 88px
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            DSColors.textOnColor,
-                            DSColors.textOnColor.withValues(alpha: 0.95),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        border: Border.all(
-                          color: DSColors.textOnColor,
-                          width: DSTokens.spaceXS / 2 + 1, // 3px
-                        ),
-                        boxShadow: [
-                          DSTokens.shadowL,
-                          BoxShadow(
-                            color: _getRoleColor(
-                              currentUser.role,
-                            ).withValues(alpha: 0.2),
-                            blurRadius: DSTokens.spaceM,
-                            offset: const Offset(0, DSTokens.spaceXS),
+                        const SizedBox(height: DSTokens.spaceXS),
+
+                        // Secondary: Email with theme-aware subtle styling
+                        Text(
+                          currentUser.email,
+                          style: DSTypography.bodyMedium.copyWith(
+                            // Dark mode: Use theme-aware secondary text color
+                            color: ref.colors.textSecondary,
                           ),
-                        ],
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              _getRoleColor(
-                                currentUser.role,
-                              ).withValues(alpha: 0.1),
-                              _getRoleColor(
-                                currentUser.role,
-                              ).withValues(alpha: 0.05),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        child: CircleAvatar(
-                          radius: DSTokens.spaceXL + DSTokens.spaceS, // 40px
-                          backgroundColor: DSColors.transparent,
-                          child: Text(
-                            currentUser.name.isNotEmpty
-                                ? currentUser.name[0].toUpperCase()
-                                : 'U',
-                            style: DSTypography.displayMedium.copyWith(
-                              color: _getRoleColor(currentUser.role),
-                              fontWeight: DSTokens.fontWeightBold,
-                              letterSpacing: -1,
-                            ),
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
+                  ),
+                ],
+              ),
 
-                    const SizedBox(width: DSTokens.spaceL),
+              const SizedBox(height: DSTokens.spaceM),
 
-                    // Info Section
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Name with improved hierarchy
-                          Text(
-                            currentUser.name,
-                            style: DSTypography.headlineMedium.copyWith(
-                              color: DSColors.textOnColor,
-                              fontWeight: DSTokens.fontWeightBold,
-                              letterSpacing: -0.8,
-                              height: 1.1,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+              // Badges section with dark mode optimization
+              Row(
+                children: [
+                  _buildRoleBadge(ref),
+                  const SizedBox(width: DSTokens.spaceS),
+                  _buildStatusIndicator(ref),
+                  const Spacer(),
 
-                          const SizedBox(height: DSTokens.spaceXS),
-
-                          // Role and Status Badges
-                          Wrap(
-                            spacing: DSTokens.spaceS,
-                            runSpacing: DSTokens.spaceXS,
-                            children: [
-                              // Role Badge
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      DSTokens.spaceS +
-                                      DSTokens.spaceXS, // 10px
-                                  vertical: DSTokens.spaceXS + 1, // 5px
-                                ),
-                                decoration: BoxDecoration(
-                                  color: DSColors.textOnColor.withValues(
-                                    alpha: 0.95,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    DSTokens.radiusM,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: DSColors.black.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                      blurRadius: DSTokens.spaceXS,
-                                      offset: const Offset(
-                                        0,
-                                        DSTokens.spaceXS / 2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      _getRoleIcon(currentUser.role),
-                                      size: DSTokens.fontS - 1, // 11px
-                                      color: _getRoleColor(currentUser.role),
-                                    ),
-                                    const SizedBox(
-                                      width: DSTokens.spaceXXS + 1,
-                                    ), // 3px
-                                    Text(
-                                      currentUser.role.value.toUpperCase(),
-                                      style: DSTypography.labelSmall.copyWith(
-                                        color: _getRoleColor(currentUser.role),
-                                        fontWeight: DSTokens.fontWeightBold,
-                                        letterSpacing: 0.6,
-                                        fontSize: DSTokens.fontXS + 1, // 9px
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Status Badge
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      DSTokens.spaceS +
-                                      DSTokens.spaceXS, // 10px
-                                  vertical: DSTokens.spaceXS + 1, // 5px
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _getStatusColor(
-                                    currentUser.status,
-                                  ).withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(
-                                    DSTokens.radiusM,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: _getStatusColor(
-                                        currentUser.status,
-                                      ).withValues(alpha: 0.3),
-                                      blurRadius: DSTokens.spaceXS,
-                                      offset: const Offset(
-                                        0,
-                                        DSTokens.spaceXS / 2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      _getStatusIcon(currentUser.status),
-                                      size: DSTokens.fontS - 1, // 11px
-                                      color: DSColors.textOnColor,
-                                    ),
-                                    const SizedBox(
-                                      width: DSTokens.spaceXXS + 1,
-                                    ), // 3px
-                                    Text(
-                                      currentUser.status.value.toUpperCase(),
-                                      style: DSTypography.labelSmall.copyWith(
-                                        color: DSColors.textOnColor,
-                                        fontWeight: DSTokens.fontWeightBold,
-                                        letterSpacing: 0.6,
-                                        fontSize: DSTokens.fontXS + 1, // 9px
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: DSTokens.spaceM),
-
-                          // Email with enhanced styling
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: DSTokens.spaceXXS,
-                              vertical: DSTokens.spaceXS / 2,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  currentUser.email,
-                                  style: DSTypography.bodyMedium.copyWith(
-                                    color: DSColors.textOnColor.withValues(
-                                      alpha: 0.9,
-                                    ),
-                                    letterSpacing: 0.3,
-                                    fontWeight: DSTokens.fontWeightRegular,
-                                    height: 1.2,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (onTap != null) ...[
-                                  const SizedBox(height: DSTokens.spaceXS),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.touch_app_rounded,
-                                        size: DSTokens.fontS,
-                                        color: DSColors.textOnColor.withValues(
-                                          alpha: 0.7,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: DSTokens.spaceXS / 2,
-                                      ),
-                                      Text(
-                                        'Tap for details',
-                                        style: DSTypography.bodySmall.copyWith(
-                                          color: DSColors.textOnColor
-                                              .withValues(alpha: 0.7),
-                                          fontSize: DSTokens.fontS,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Clear CTA with theme-aware colors
+                  if (onTap != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: DSTokens.fontM,
+                          // Dark mode: Use theme-aware tertiary color
+                          color: ref.colors.textTertiary,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                ],
               ),
             ],
           ),
