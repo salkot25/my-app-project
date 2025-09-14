@@ -130,7 +130,7 @@ final themeModeProvider = Provider<AppThemeMode>((ref) {
   return asyncTheme.when(
     data: (themeMode) => themeMode,
     loading: () => AppThemeMode.system,
-    error: (_, __) => AppThemeMode.system,
+    error: (_, _) => AppThemeMode.system,
   );
 });
 

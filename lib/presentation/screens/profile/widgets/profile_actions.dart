@@ -3,11 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
-import '../../../../design_system/utils/theme_colors.dart';
-import '../../../../design_system/providers/theme_provider.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
-import 'theme_mode_selector.dart';
+import '../../offline/offline_demo_screen.dart';
+import '../../permissions/permission_management_screen.dart';
 
 /// Enhanced ProfileActions with senior UX principles:
 /// 1. Better information architecture with logical grouping
@@ -389,6 +388,280 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
     );
   }
 
+  void _showThemeBottomSheet(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.read(themeModeProvider);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: ref.colors.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(DSTokens.radiusL),
+            topRight: Radius.circular(DSTokens.radiusL),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: DSTokens.spaceS),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: ref.colors.textTertiary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(DSTokens.spaceL),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(DSTokens.spaceS),
+                    decoration: BoxDecoration(
+                      color: _getRoleColor(
+                        widget.currentUser.role,
+                      ).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                    ),
+                    child: Icon(
+                      Icons.palette_rounded,
+                      color: _getRoleColor(widget.currentUser.role),
+                      size: DSTokens.fontL,
+                    ),
+                  ),
+                  const SizedBox(width: DSTokens.spaceM),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Choose Theme',
+                          style: DSTypography.headlineSmall.copyWith(
+                            color: ref.colors.textPrimary,
+                            fontWeight: DSTokens.fontWeightBold,
+                          ),
+                        ),
+                        Text(
+                          'Select your preferred theme mode',
+                          style: DSTypography.bodySmall.copyWith(
+                            color: ref.colors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: ref.colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Theme options
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                DSTokens.spaceL,
+                0,
+                DSTokens.spaceL,
+                DSTokens.spaceL,
+              ),
+              child: Column(
+                children: AppThemeMode.values.map((themeMode) {
+                  final isSelected = currentTheme == themeMode;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: DSTokens.spaceS),
+                    child: _buildThemeOption(
+                      context,
+                      ref,
+                      themeMode,
+                      isSelected,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+            // Safe area bottom padding
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(
+    BuildContext context,
+    WidgetRef ref,
+    AppThemeMode themeMode,
+    bool isSelected,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected
+            ? _getRoleColor(widget.currentUser.role).withValues(alpha: 0.1)
+            : ref.colors.surfaceContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(DSTokens.radiusL),
+        border: Border.all(
+          color: isSelected
+              ? _getRoleColor(widget.currentUser.role).withValues(alpha: 0.3)
+              : ref.colors.border,
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await ref.read(themeProvider.notifier).setThemeMode(themeMode);
+            if (context.mounted) {
+              Navigator.of(context).pop();
+
+              // Show feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(
+                        Icons.check_rounded,
+                        color: DSColors.textOnColor,
+                        size: DSTokens.fontM,
+                      ),
+                      const SizedBox(width: DSTokens.spaceS),
+                      Text(
+                        'Theme changed to ${_getThemeDescription(themeMode)}',
+                        style: DSTypography.bodyMedium.copyWith(
+                          color: DSColors.textOnColor,
+                          fontWeight: DSTokens.fontWeightMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: _getRoleColor(widget.currentUser.role),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.all(DSTokens.spaceM),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(DSTokens.radiusL),
+          child: Padding(
+            padding: const EdgeInsets.all(DSTokens.spaceL),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(DSTokens.spaceS),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? _getRoleColor(
+                            widget.currentUser.role,
+                          ).withValues(alpha: 0.2)
+                        : ref.colors.textSecondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(DSTokens.radiusM),
+                  ),
+                  child: Icon(
+                    themeMode.icon,
+                    color: isSelected
+                        ? _getRoleColor(widget.currentUser.role)
+                        : ref.colors.textSecondary,
+                    size: DSTokens.fontL,
+                  ),
+                ),
+                const SizedBox(width: DSTokens.spaceM),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        themeMode.displayName,
+                        style: DSTypography.bodyLarge.copyWith(
+                          color: isSelected
+                              ? _getRoleColor(widget.currentUser.role)
+                              : ref.colors.textPrimary,
+                          fontWeight: isSelected
+                              ? DSTokens.fontWeightBold
+                              : DSTokens.fontWeightSemiBold,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      const SizedBox(height: DSTokens.spaceXS / 2),
+                      Text(
+                        _getThemeFullDescription(themeMode),
+                        style: DSTypography.bodySmall.copyWith(
+                          color: ref.colors.textSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: DSTokens.spaceM),
+                if (isSelected)
+                  Container(
+                    padding: const EdgeInsets.all(DSTokens.spaceXS),
+                    decoration: BoxDecoration(
+                      color: _getRoleColor(widget.currentUser.role),
+                      borderRadius: BorderRadius.circular(DSTokens.radiusS),
+                    ),
+                    child: Icon(
+                      Icons.check_rounded,
+                      color: DSColors.textOnColor,
+                      size: DSTokens.fontM,
+                    ),
+                  )
+                else
+                  Container(
+                    width: DSTokens.fontL + (DSTokens.spaceXS * 2),
+                    height: DSTokens.fontL + (DSTokens.spaceXS * 2),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: ref.colors.border, width: 1.5),
+                      borderRadius: BorderRadius.circular(DSTokens.radiusS),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getThemeDescription(AppThemeMode themeMode) {
+    switch (themeMode) {
+      case AppThemeMode.light:
+        return 'Light Mode';
+      case AppThemeMode.dark:
+        return 'Dark Mode';
+      case AppThemeMode.system:
+        return 'System Mode';
+    }
+  }
+
+  String _getThemeFullDescription(AppThemeMode themeMode) {
+    switch (themeMode) {
+      case AppThemeMode.light:
+        return 'Always use light theme';
+      case AppThemeMode.dark:
+        return 'Always use dark theme';
+      case AppThemeMode.system:
+        return 'Follow system settings';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -420,7 +693,7 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
               trailing: Switch.adaptive(
                 value: _notificationsEnabled,
                 onChanged: _toggleNotifications,
-                activeColor: _getRoleColor(widget.currentUser.role),
+                activeThumbColor: _getRoleColor(widget.currentUser.role),
                 activeTrackColor: _getRoleColor(
                   widget.currentUser.role,
                 ).withValues(alpha: 0.3),
@@ -433,7 +706,55 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
             const SizedBox(height: DSTokens.spaceS),
 
             // Theme Selection
-            ThemeModeSelector(currentUser: widget.currentUser),
+            _buildMenuTile(
+              icon: ref.watch(themeModeProvider).icon,
+              title: 'Theme Mode',
+              subtitle: ref.watch(themeModeProvider).displayName,
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: ref.colors.textTertiary,
+                size: DSTokens.fontL,
+              ),
+              onTap: () => _showThemeBottomSheet(context, ref),
+            ),
+
+            const SizedBox(height: DSTokens.spaceS),
+
+            _buildMenuTile(
+              icon: Icons.security_rounded,
+              title: 'App Permissions',
+              subtitle: 'Manage app permissions and privacy settings',
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: ref.colors.textTertiary,
+                size: DSTokens.fontL,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const PermissionManagementScreen(),
+                  ),
+                );
+              },
+            ),
+
+            _buildMenuTile(
+              icon: Icons.offline_bolt_rounded,
+              title: 'Offline Mode',
+              subtitle: 'Test offline functionality and sync status',
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: ref.colors.textTertiary,
+                size: DSTokens.fontL,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const OfflineDemoScreen(),
+                  ),
+                );
+              },
+            ),
 
             _buildSectionDivider(),
 

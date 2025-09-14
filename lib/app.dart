@@ -2,20 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'presentation/providers/auth_provider.dart';
+import 'presentation/providers/offline_auth_provider_new.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/main_screen.dart';
 import 'presentation/widgets/status_gate.dart';
+import 'presentation/widgets/connectivity/offline_status_indicator.dart';
+import 'core/services/offline_sync_service.dart';
 import 'design_system/design_system.dart';
 
-/// Root app widget
-class MyApp extends ConsumerWidget {
+/// Root app widget with offline support
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Watch auth state to trigger router refresh when state changes
-    ref.watch(authProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize offline sync service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final syncService = ref.read(offlineSyncServiceProvider);
+      syncService.initialize();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch enhanced auth state that includes offline capabilities
+    ref.watch(enhancedAuthStateProvider);
 
     // Watch theme mode from provider
     final themeMode = ref.watch(flutterThemeModeProvider);
@@ -27,20 +46,49 @@ class MyApp extends ConsumerWidget {
       themeMode: themeMode,
       routerConfig: _createRouter(ref),
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        // Wrap with offline status indicator
+        return Scaffold(
+          body: Stack(
+            children: [
+              child ?? const SizedBox.shrink(),
+
+              // Show offline status indicator at the top
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Container(
+                    color: Colors.transparent,
+                    child: const OfflineStatusIndicator(
+                      showDetails: false,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  /// Router configuration using GoRouter
+  /// Router configuration using GoRouter with offline support
   GoRouter _createRouter(WidgetRef ref) => GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
-      final authState = ref.read(authProvider);
+      final authState = ref.read(enhancedAuthStateProvider);
       final isLoading = authState.isLoading;
       final isAuthenticated = authState.isAuthenticated;
-      final isVerified = authState.isVerified;
+      final isOfflineMode = authState.isOfflineMode;
 
       print(
-        'Router redirect - Auth state: isLoading=$isLoading, isAuthenticated=$isAuthenticated, isVerified=$isVerified, location=${state.fullPath}',
+        'Router redirect - Auth state: isLoading=$isLoading, isAuthenticated=$isAuthenticated, isOfflineMode=$isOfflineMode, location=${state.fullPath}',
       );
 
       // Show loading screen if auth state is still loading and we're not already there
@@ -53,9 +101,9 @@ class MyApp extends ConsumerWidget {
       if (!isLoading && state.fullPath == '/loading') {
         if (isAuthenticated) {
           print(
-            'Auth loaded and authenticated, redirecting from loading to profile',
+            'Auth loaded and authenticated, redirecting from loading to main',
           );
-          return '/profile';
+          return '/main';
         } else {
           print(
             'Auth loaded but not authenticated, redirecting from loading to login',
@@ -80,15 +128,6 @@ class MyApp extends ConsumerWidget {
           isPublicRoute &&
           state.fullPath != '/loading') {
         print('Authenticated, redirecting from public route to main');
-        return '/main';
-      }
-
-      // If authenticated but not verified, only allow access to main screen
-      if (isAuthenticated &&
-          !isLoading &&
-          !isVerified &&
-          state.fullPath != '/main') {
-        print('Not verified, redirecting to main');
         return '/main';
       }
 

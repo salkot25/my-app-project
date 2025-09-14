@@ -10,10 +10,12 @@ class DSColors {
   static const Color brandPrimary = Color(0xFF3498DB); // Modern blue
   static const Color brandSecondary = Color(0xFF5DADE2); // Light blue
   static const Color brandAccent = Color(0xFF2E86AB); // Dark blue
-  
+
   // Ultra-minimalist brand additions
-  static const Color brandUltraLight = Color(0xFFF0F8FF); // Almost white with hint of blue
-  static const Color brandWhisper = Color(0xFFFAFCFF);    // Whisper of brand color
+  static const Color brandUltraLight = Color(
+    0xFFF0F8FF,
+  ); // Almost white with hint of blue
+  static const Color brandWhisper = Color(0xFFFAFCFF); // Whisper of brand color
 
   // Legacy aliases for backward compatibility
   static const Color brand = brandPrimary;
@@ -33,7 +35,9 @@ class DSColors {
   static const Color brandPrimary900 = Color(0xFF0D47A1);
 
   // Modern Gray Scale - Professional Neutrals Enhanced for Minimalism
-  static const Color primary25 = Color(0xFFFCFCFD);  // Ultra-light for minimal backgrounds
+  static const Color primary25 = Color(
+    0xFFFCFCFD,
+  ); // Ultra-light for minimal backgrounds
   static const Color primary50 = Color(0xFFF8FAFC); // Background light
   static const Color primary100 = Color(0xFFF1F5F9); // Very light
   static const Color primary200 = Color(0xFFE2E8F0); // Light border
@@ -44,7 +48,9 @@ class DSColors {
   static const Color primary700 = Color(0xFF334155); // Text dark
   static const Color primary800 = Color(0xFF1E293B); // Very dark
   static const Color primary900 = Color(0xFF1A202C); // Text primary
-  static const Color primary950 = Color(0xFF0F172A); // Ultra-dark for minimalist contrast
+  static const Color primary950 = Color(
+    0xFF0F172A,
+  ); // Ultra-dark for minimalist contrast
 
   // Modern Semantic Colors
   static const Color success = Color(0xFF10B981); // Modern green
