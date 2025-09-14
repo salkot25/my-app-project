@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/remote/auth_remote_datasource.dart';
 import '../../data/datasources/remote/user_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
-import '../../data/repositories/user_repository_impl.dart';
+import '../../data/repositories/offline_first_user_repository.dart';
 import '../../domain/entities/user.dart' as domain;
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -38,9 +38,8 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 });
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  return UserRepositoryImpl(
-    userRemoteDataSource: ref.watch(userRemoteDataSourceProvider),
-  );
+  // Use offline-first repository for better offline experience
+  return ref.watch(offlineFirstUserRepositoryProvider);
 });
 
 // Use cases

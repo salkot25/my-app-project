@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
-import '../../../../design_system/utils/theme_colors.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
 

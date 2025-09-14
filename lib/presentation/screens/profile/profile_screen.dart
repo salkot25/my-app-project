@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../design_system/design_system.dart';
-import '../../design_system/utils/theme_colors.dart';
-import '../providers/auth_provider.dart';
-import 'profile/widgets/profile_header.dart';
-import 'profile/widgets/profile_actions.dart';
-import 'profile/widgets/profile_detail_dialog.dart';
+import '../../../design_system/design_system.dart';
+import '../../providers/auth_provider.dart';
+import 'widgets/profile_header.dart';
+import 'widgets/profile_actions.dart';
+import 'widgets/profile_detail_dialog.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -16,10 +15,18 @@ class ProfileScreen extends ConsumerWidget {
     final currentUser = authState.domainUser;
 
     void showProfileDetailDialog() {
-      showDialog(
+      showModalBottomSheet(
         context: context,
-        barrierDismissible: true,
-        builder: (context) => ProfileDetailDialog(currentUser: currentUser!),
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        barrierColor: Colors.black.withValues(alpha: 0.5),
+        builder: (context) => DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.7,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) =>
+              ProfileDetailDialog(currentUser: currentUser!),
+        ),
       );
     }
 

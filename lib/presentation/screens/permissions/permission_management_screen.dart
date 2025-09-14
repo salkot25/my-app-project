@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../design_system/design_system.dart';
-import '../../../design_system/utils/theme_colors.dart';
 import '../../../domain/entities/app_permission.dart';
 import '../../providers/permission_provider.dart';
 
@@ -45,71 +44,100 @@ class _PermissionManagementScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ref.colors.background,
-      appBar: AppBar(
-        backgroundColor: ref.colors.surface,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.arrow_back_rounded, color: ref.colors.textPrimary),
-        ),
-        title: Text(
-          'App Permissions',
-          style: DSTypography.headlineSmall.copyWith(
-            color: ref.colors.textPrimary,
-            fontWeight: DSTokens.fontWeightBold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _showPermissionInfo,
-            icon: Icon(
-              Icons.info_outline_rounded,
-              color: ref.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(width: DSTokens.spaceS),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  ref.colors.border,
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.5, 1.0],
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            children: [
+              // Header Section - same style as other screens
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  DSTokens.spaceL,
+                  DSTokens.spaceL,
+                  DSTokens.spaceL,
+                  0,
+                ),
+                child: Row(
+                  children: [
+                    // Back button
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ref.colors.surfaceContainer,
+                        borderRadius: BorderRadius.circular(DSTokens.radiusL),
+                        border: Border.all(color: ref.colors.border, width: 1),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(
+                          Icons.arrow_back_rounded,
+                          color: ref.colors.textPrimary,
+                          size: DSTokens.fontL,
+                        ),
+                        tooltip: 'Back',
+                      ),
+                    ),
+
+                    const SizedBox(width: DSTokens.spaceL),
+
+                    // Title section
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'App Permissions',
+                            style: DSTypography.displaySmall.copyWith(
+                              color: ref.colors.textPrimary,
+                              fontWeight: DSTokens.fontWeightBold,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                          const SizedBox(height: DSTokens.spaceXS),
+                          Text(
+                            'Control which device features this app can access',
+                            style: DSTypography.bodyLarge.copyWith(
+                              color: ref.colors.textSecondary,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-        ),
-      ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: RefreshIndicator(
-          color: DSColors.brandPrimary,
-          onRefresh: () async {
-            // Refresh permission states
-            ref.invalidate(permissionProvider);
-            await Future.delayed(const Duration(milliseconds: 500));
-          },
-          child: CustomScrollView(
-            slivers: [
-              // Permission Summary Header
-              SliverToBoxAdapter(child: _buildPermissionSummary()),
 
-              // Critical Permissions Section
-              SliverToBoxAdapter(child: _buildCriticalPermissionsSection()),
+              const SizedBox(height: DSTokens.spaceL),
 
-              // All Permissions List
-              SliverToBoxAdapter(child: _buildAllPermissionsSection()),
+              // Content
+              Expanded(
+                child: RefreshIndicator(
+                  color: DSColors.brandPrimary,
+                  onRefresh: () async {
+                    // Refresh permission states
+                    ref.invalidate(permissionProvider);
+                    await Future.delayed(const Duration(milliseconds: 500));
+                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      // Permission Summary Header
+                      SliverToBoxAdapter(child: _buildPermissionSummary()),
 
-              // Bottom Spacing
-              const SliverToBoxAdapter(
-                child: SizedBox(height: DSTokens.spaceXL),
+                      // Critical Permissions Section
+                      SliverToBoxAdapter(
+                        child: _buildCriticalPermissionsSection(),
+                      ),
+
+                      // All Permissions List
+                      SliverToBoxAdapter(child: _buildAllPermissionsSection()),
+
+                      // Bottom Spacing
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: DSTokens.spaceXL),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -431,8 +459,125 @@ class _PermissionManagementScreenState
           ),
           const SizedBox(height: DSTokens.spaceL),
 
-          // All permission tiles
-          ...AppPermissionType.values.map((type) => _buildPermissionTile(type)),
+          // Grouped permission tiles by category
+          ...AppPermissionType.values
+                  .where(
+                    (type) => _getPermissionCategory(type) == 'Device Access',
+                  )
+                  .isNotEmpty
+              ? [
+                  _buildCategoryHeader(
+                    'Device Access',
+                    Icons.smartphone_rounded,
+                  ),
+                  ...AppPermissionType.values
+                      .where(
+                        (type) =>
+                            _getPermissionCategory(type) == 'Device Access',
+                      )
+                      .map((type) => _buildPermissionTile(type)),
+                  const SizedBox(height: DSTokens.spaceM),
+                ]
+              : <Widget>[],
+
+          ...AppPermissionType.values
+                  .where(
+                    (type) => _getPermissionCategory(type) == 'Media & Files',
+                  )
+                  .isNotEmpty
+              ? [
+                  _buildCategoryHeader(
+                    'Media & Files',
+                    Icons.photo_library_rounded,
+                  ),
+                  ...AppPermissionType.values
+                      .where(
+                        (type) =>
+                            _getPermissionCategory(type) == 'Media & Files',
+                      )
+                      .map((type) => _buildPermissionTile(type)),
+                  const SizedBox(height: DSTokens.spaceM),
+                ]
+              : <Widget>[],
+
+          ...AppPermissionType.values
+                  .where(
+                    (type) => _getPermissionCategory(type) == 'Communication',
+                  )
+                  .isNotEmpty
+              ? [
+                  _buildCategoryHeader('Communication', Icons.chat_rounded),
+                  ...AppPermissionType.values
+                      .where(
+                        (type) =>
+                            _getPermissionCategory(type) == 'Communication',
+                      )
+                      .map((type) => _buildPermissionTile(type)),
+                ]
+              : <Widget>[],
+
+          // Fallback for uncategorized permissions
+          ...AppPermissionType.values
+              .where((type) => _getPermissionCategory(type) == 'Other')
+              .map((type) => _buildPermissionTile(type)),
+        ],
+      ),
+    );
+  }
+
+  String _getPermissionCategory(AppPermissionType type) {
+    switch (type) {
+      case AppPermissionType.camera:
+      case AppPermissionType.microphone:
+      case AppPermissionType.location:
+        return 'Device Access';
+      case AppPermissionType.storage:
+      case AppPermissionType.photos:
+        return 'Media & Files';
+      case AppPermissionType.contacts:
+      case AppPermissionType.phone:
+        return 'Communication';
+      default:
+        return 'Other';
+    }
+  }
+
+  Widget _buildCategoryHeader(String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: DSTokens.spaceM),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(DSTokens.spaceXS),
+            decoration: BoxDecoration(
+              color: ref.colors.surfaceContainer,
+              borderRadius: BorderRadius.circular(DSTokens.radiusS),
+            ),
+            child: Icon(
+              icon,
+              size: DSTokens.fontM,
+              color: ref.colors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: DSTokens.spaceS),
+          Text(
+            title,
+            style: DSTypography.bodyLarge.copyWith(
+              color: ref.colors.textPrimary,
+              fontWeight: DSTokens.fontWeightSemiBold,
+            ),
+          ),
+          const SizedBox(width: DSTokens.spaceS),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [ref.colors.border, Colors.transparent],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -445,7 +590,7 @@ class _PermissionManagementScreenState
         final isGranted = permissionStatus == PermissionStatus.granted;
 
         return Container(
-          margin: const EdgeInsets.only(bottom: DSTokens.spaceM),
+          margin: const EdgeInsets.only(bottom: DSTokens.spaceS),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -454,7 +599,7 @@ class _PermissionManagementScreenState
                   : null,
               borderRadius: BorderRadius.circular(DSTokens.radiusM),
               child: Container(
-                padding: const EdgeInsets.all(DSTokens.spaceM),
+                padding: const EdgeInsets.all(DSTokens.spaceL),
                 decoration: BoxDecoration(
                   color: isGranted
                       ? DSColors.success.withValues(alpha: 0.05)
@@ -467,76 +612,184 @@ class _PermissionManagementScreenState
                     width: 1,
                   ),
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(DSTokens.spaceS),
-                      decoration: BoxDecoration(
-                        color:
-                            (permissionStatus?.statusColor ??
-                                    DSColors.textSecondary)
-                                .withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(DSTokens.spaceS),
-                      ),
-                      child: Icon(
-                        type.icon,
-                        color:
-                            permissionStatus?.statusColor ??
-                            DSColors.textSecondary,
-                        size: DSTokens.fontL,
-                      ),
-                    ),
-                    const SizedBox(width: DSTokens.spaceM),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                type.displayName,
-                                style: DSTypography.bodyLarge.copyWith(
-                                  color: ref.colors.textPrimary,
-                                  fontWeight: DSTokens.fontWeightSemiBold,
-                                ),
-                              ),
-                              if (type.isCritical) ...[
-                                const SizedBox(width: DSTokens.spaceS),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: DSTokens.spaceXS,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: DSColors.error.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(
-                                      DSTokens.radiusXS,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Required',
-                                    style: DSTypography.labelSmall.copyWith(
-                                      color: DSColors.error,
-                                      fontSize: 10,
-                                      fontWeight: DSTokens.fontWeightMedium,
-                                    ),
-                                  ),
-                                ),
+                    Row(
+                      children: [
+                        // Enhanced icon with gradient background
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                (permissionStatus?.statusColor ??
+                                        DSColors.textSecondary)
+                                    .withValues(alpha: 0.15),
+                                (permissionStatus?.statusColor ??
+                                        DSColors.textSecondary)
+                                    .withValues(alpha: 0.05),
                               ],
-                            ],
-                          ),
-                          const SizedBox(height: DSTokens.spaceXS),
-                          Text(
-                            type.description,
-                            style: DSTypography.bodySmall.copyWith(
-                              color: ref.colors.textSecondary,
-                              height: 1.4,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              DSTokens.radiusM,
+                            ),
+                            border: Border.all(
+                              color:
+                                  (permissionStatus?.statusColor ??
+                                          DSColors.textSecondary)
+                                      .withValues(alpha: 0.2),
+                              width: 1,
                             ),
                           ),
-                          const SizedBox(height: DSTokens.spaceXS),
-                          Row(
+                          child: Icon(
+                            type.icon,
+                            color:
+                                permissionStatus?.statusColor ??
+                                DSColors.textSecondary,
+                            size: DSTokens.fontXL,
+                          ),
+                        ),
+                        const SizedBox(width: DSTokens.spaceL),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      type.displayName,
+                                      style: DSTypography.headlineSmall
+                                          .copyWith(
+                                            color: ref.colors.textPrimary,
+                                            fontWeight:
+                                                DSTokens.fontWeightSemiBold,
+                                          ),
+                                    ),
+                                  ),
+                                  if (type.isCritical) ...[
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: DSTokens.spaceS,
+                                        vertical: DSTokens.spaceXS,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            DSColors.error.withValues(
+                                              alpha: 0.15,
+                                            ),
+                                            DSColors.error.withValues(
+                                              alpha: 0.05,
+                                            ),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          DSTokens.radiusS,
+                                        ),
+                                        border: Border.all(
+                                          color: DSColors.error.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.priority_high_rounded,
+                                            size: 12,
+                                            color: DSColors.error,
+                                          ),
+                                          const SizedBox(
+                                            width: DSTokens.spaceXS,
+                                          ),
+                                          Text(
+                                            'Required',
+                                            style: DSTypography.labelSmall
+                                                .copyWith(
+                                                  color: DSColors.error,
+                                                  fontSize: 10,
+                                                  fontWeight: DSTokens
+                                                      .fontWeightSemiBold,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: DSTokens.spaceXS),
+                              Text(
+                                type.description,
+                                style: DSTypography.bodyMedium.copyWith(
+                                  color: ref.colors.textSecondary,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: DSTokens.spaceL),
+                        if (permissionStatus?.canToggle == true)
+                          Switch.adaptive(
+                            value: isGranted,
+                            onChanged: (value) =>
+                                _togglePermission(type, !value),
+                            activeTrackColor: DSColors.success,
+                            activeThumbColor: DSColors.white,
+                            inactiveThumbColor: ref.colors.textTertiary,
+                            inactiveTrackColor: ref.colors.surfaceContainer,
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(DSTokens.spaceS),
+                            decoration: BoxDecoration(
+                              color: ref.colors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusS,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.lock_outline,
+                              color: ref.colors.textTertiary,
+                              size: DSTokens.fontM,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: DSTokens.spaceM),
+                    // Status row with enhanced styling
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: DSTokens.spaceM,
+                            vertical: DSTokens.spaceS,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                (permissionStatus?.statusColor ??
+                                        DSColors.textTertiary)
+                                    .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(
+                              DSTokens.radiusS,
+                            ),
+                            border: Border.all(
+                              color:
+                                  (permissionStatus?.statusColor ??
+                                          DSColors.textTertiary)
+                                      .withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 permissionStatus?.statusIcon ??
@@ -546,39 +799,53 @@ class _PermissionManagementScreenState
                                     permissionStatus?.statusColor ??
                                     DSColors.textTertiary,
                               ),
-                              const SizedBox(width: DSTokens.spaceXS),
+                              const SizedBox(width: DSTokens.spaceS),
                               Text(
                                 permissionStatus?.displayName ?? 'Unknown',
-                                style: DSTypography.labelSmall.copyWith(
+                                style: DSTypography.labelMedium.copyWith(
                                   color:
                                       permissionStatus?.statusColor ??
                                       DSColors.textTertiary,
-                                  fontWeight: DSTokens.fontWeightMedium,
+                                  fontWeight: DSTokens.fontWeightSemiBold,
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: DSTokens.spaceM),
-                    if (permissionStatus?.canToggle == true)
-                      Switch.adaptive(
-                        value: isGranted,
-                        onChanged: (value) => _togglePermission(type, !value),
-                        activeColor: DSColors.success,
-                        activeTrackColor: DSColors.success.withValues(
-                          alpha: 0.3,
                         ),
-                        inactiveThumbColor: ref.colors.textTertiary,
-                        inactiveTrackColor: ref.colors.surfaceContainer,
-                      )
-                    else
-                      Icon(
-                        Icons.lock_outline,
-                        color: ref.colors.textTertiary,
-                        size: DSTokens.fontM,
-                      ),
+                        const Spacer(),
+                        if (isGranted)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: DSTokens.spaceS,
+                              vertical: DSTokens.spaceXS,
+                            ),
+                            decoration: BoxDecoration(
+                              color: DSColors.success.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusS,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified_rounded,
+                                  size: 12,
+                                  color: DSColors.success,
+                                ),
+                                const SizedBox(width: DSTokens.spaceXS),
+                                Text(
+                                  'Active',
+                                  style: DSTypography.labelSmall.copyWith(
+                                    color: DSColors.success,
+                                    fontWeight: DSTokens.fontWeightMedium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -671,93 +938,5 @@ class _PermissionManagementScreenState
         ),
       );
     }
-  }
-
-  void _showPermissionInfo() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: ref.colors.surface,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DSTokens.radiusL),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(DSTokens.spaceS),
-              decoration: BoxDecoration(
-                color: DSColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(DSTokens.radiusM),
-              ),
-              child: Icon(
-                Icons.info_outline_rounded,
-                color: DSColors.info,
-                size: DSTokens.fontL,
-              ),
-            ),
-            const SizedBox(width: DSTokens.spaceM),
-            Text(
-              'About Permissions',
-              style: DSTypography.headlineSmall.copyWith(
-                color: ref.colors.textPrimary,
-                fontWeight: DSTokens.fontWeightBold,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'App permissions control what device features this app can access. You can grant or deny permissions at any time.',
-              style: DSTypography.bodyMedium.copyWith(
-                color: ref.colors.textPrimary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: DSTokens.spaceM),
-            Container(
-              padding: const EdgeInsets.all(DSTokens.spaceM),
-              decoration: BoxDecoration(
-                color: DSColors.brandPrimary.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(DSTokens.radiusM),
-                border: Border.all(
-                  color: DSColors.brandPrimary.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                'Critical permissions are required for core app functionality and should be granted for the best experience.',
-                style: DSTypography.bodySmall.copyWith(
-                  color: DSColors.brandPrimary,
-                  fontWeight: DSTokens.fontWeightMedium,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: ref.colors.textSecondary,
-              padding: const EdgeInsets.symmetric(
-                horizontal: DSTokens.spaceL,
-                vertical: DSTokens.spaceM,
-              ),
-            ),
-            child: Text(
-              'Got it',
-              style: DSTypography.buttonMedium.copyWith(
-                fontWeight: DSTokens.fontWeightMedium,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

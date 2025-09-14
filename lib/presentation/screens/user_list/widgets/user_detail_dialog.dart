@@ -157,26 +157,21 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Dialog(
-      backgroundColor: DSColors.transparent,
+      backgroundColor: Colors.transparent,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 520, maxHeight: 750),
         decoration: BoxDecoration(
-          color: DSColors.surface,
+          color: ref.colors.surface,
           borderRadius: BorderRadius.circular(DSTokens.radiusXL),
           boxShadow: [
             BoxShadow(
-              color: isDark
-                  ? DSColors.black.withValues(alpha: 0.5)
-                  : DSColors.black.withValues(alpha: 0.15),
-              blurRadius: isDark ? 16 : 24,
+              color: ref.colors.textPrimary.withValues(alpha: 0.1),
+              blurRadius: 24,
               offset: const Offset(0, 8),
-              spreadRadius: isDark ? 2 : 0,
             ),
           ],
+          border: Border.all(color: ref.colors.border, width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -269,7 +264,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                           ),
                           child: CircleAvatar(
                             radius: DSTokens.spaceXL + DSTokens.spaceXS,
-                            backgroundColor: DSColors.transparent,
+                            backgroundColor: Colors.transparent,
                             child: Text(
                               currentUser.name.isNotEmpty
                                   ? currentUser.name[0].toUpperCase()
@@ -488,9 +483,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
     return Container(
       padding: const EdgeInsets.all(DSTokens.spaceL),
       decoration: BoxDecoration(
-        color: DSColors.surfaceContainer,
+        color: ref.colors.surfaceContainer,
         borderRadius: BorderRadius.circular(DSTokens.radiusM),
-        border: Border.all(color: DSColors.lightBorder, width: 1),
+        border: Border.all(color: ref.colors.border, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,9 +643,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
     return Container(
       padding: const EdgeInsets.all(DSTokens.spaceM),
       decoration: BoxDecoration(
-        color: DSColors.surfaceContainer,
+        color: ref.colors.surfaceContainer,
         borderRadius: BorderRadius.circular(DSTokens.radiusM),
-        border: Border.all(color: DSColors.lightBorder, width: 1),
+        border: Border.all(color: ref.colors.border, width: 0.5),
       ),
       child: Row(
         children: [

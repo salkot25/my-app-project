@@ -23,9 +23,6 @@ class UserSearchSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: DSTokens.spaceL,
@@ -37,17 +34,12 @@ class UserSearchSection extends ConsumerWidget {
           borderRadius: BorderRadius.circular(DSTokens.radiusL),
           boxShadow: [
             BoxShadow(
-              color: isDark
-                  ? DSColors.black.withValues(alpha: 0.3)
-                  : DSColors.black.withValues(alpha: 0.08),
-              blurRadius: isDark ? 8 : 12,
+              color: ref.colors.textPrimary.withValues(alpha: 0.06),
+              blurRadius: 12,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(
-            color: isDark ? DSColors.neutral700 : DSColors.neutral200,
-            width: 0.5,
-          ),
+          border: Border.all(color: ref.colors.border, width: 0.5),
         ),
         child: _buildSearchBar(ref),
       ),
@@ -55,12 +47,8 @@ class UserSearchSection extends ConsumerWidget {
   }
 
   Widget _buildSearchBar(WidgetRef ref) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ref.colors.surfaceContainer,
-        borderRadius: BorderRadius.circular(DSTokens.radiusL),
-        border: Border.all(color: ref.colors.border.withValues(alpha: 0.5)),
-      ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(DSTokens.radiusL),
       child: Row(
         children: [
           // Role filter dropdown
@@ -72,40 +60,57 @@ class UserSearchSection extends ConsumerWidget {
           ),
           // Search field
           Expanded(
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search users...',
-                hintStyle: DSTypography.bodyMedium.copyWith(
-                  color: ref.colors.textSecondary,
-                  fontSize: 15,
-                ),
-                prefixIcon: Icon(
-                  Icons.search_rounded,
-                  color: ref.colors.textSecondary,
-                  size: 20,
-                ),
-                suffixIcon: searchQuery.isNotEmpty
-                    ? IconButton(
-                        onPressed: () {
-                          searchController.clear();
-                          onSearchChanged('');
-                        },
-                        icon: Icon(
-                          Icons.close_rounded,
-                          color: ref.colors.textSecondary,
-                          size: 18,
-                        ),
-                      )
-                    : null,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DSTokens.spaceM,
-                  vertical: DSTokens.spaceM + 2,
+            child: Container(
+              decoration: BoxDecoration(
+                color: ref
+                    .colors
+                    .surfaceContainer, // Different color from dropdown
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(DSTokens.radiusL),
+                  bottomRight: Radius.circular(DSTokens.radiusL),
                 ),
               ),
-              enabled: isEnabled,
-              onChanged: onSearchChanged,
+              child: TextField(
+                controller: searchController,
+                style: DSTypography.bodyMedium.copyWith(
+                  color: ref.colors.textPrimary,
+                  fontSize: 15,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search users...',
+                  hintStyle: DSTypography.bodyMedium.copyWith(
+                    color: ref.colors.textSecondary,
+                    fontSize: 15,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: ref.colors.textSecondary,
+                    size: 20,
+                  ),
+                  suffixIcon: searchQuery.isNotEmpty
+                      ? IconButton(
+                          onPressed: () {
+                            searchController.clear();
+                            onSearchChanged('');
+                          },
+                          icon: Icon(
+                            Icons.close_rounded,
+                            color: ref.colors.textSecondary,
+                            size: 18,
+                          ),
+                          splashRadius: 16,
+                          tooltip: 'Clear search',
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DSTokens.spaceM,
+                    vertical: DSTokens.spaceM + 2,
+                  ),
+                ),
+                enabled: isEnabled,
+                onChanged: onSearchChanged,
+              ),
             ),
           ),
         ],
@@ -115,6 +120,13 @@ class UserSearchSection extends ConsumerWidget {
 
   Widget _buildRoleDropdown(WidgetRef ref) {
     return Container(
+      decoration: BoxDecoration(
+        color: ref.colors.surface, // Different color from search field
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(DSTokens.radiusL),
+          bottomLeft: Radius.circular(DSTokens.radiusL),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: DSTokens.spaceM),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<UserRole?>(
@@ -141,6 +153,9 @@ class UserSearchSection extends ConsumerWidget {
             Icons.arrow_drop_down_rounded,
             color: ref.colors.textSecondary,
           ),
+          dropdownColor: ref.colors.surface,
+          borderRadius: BorderRadius.circular(DSTokens.radiusM),
+          elevation: 8,
           items: [
             DropdownMenuItem<UserRole?>(
               value: null,

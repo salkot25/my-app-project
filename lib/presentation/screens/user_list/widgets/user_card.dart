@@ -6,7 +6,7 @@ import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
 import 'user_detail_dialog.dart';
 
-class UserCard extends ConsumerWidget {
+class UserCard extends ConsumerStatefulWidget {
   final User user;
   final bool isCurrentUser;
   final bool isEnabled;
@@ -27,40 +27,95 @@ class UserCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: isEnabled ? () => _showUserDetail(context, ref) : null,
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: DSTokens.spaceL,
-          vertical: DSTokens.spaceS,
-        ),
-        decoration: BoxDecoration(
-          color: ref.colors.surface,
-          borderRadius: BorderRadius.circular(DSTokens.radiusM),
-          border: Border.all(color: ref.colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: DSColors.black.withValues(alpha: 0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(DSTokens.spaceL),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User header (name, email, badges)
-              _buildUserHeader(ref),
-              const SizedBox(height: DSTokens.spaceM),
+  ConsumerState<UserCard> createState() => _UserCardState();
+}
 
-              // User details (role, status)
-              _buildUserDetails(ref),
-            ],
-          ),
-        ),
+class _UserCardState extends ConsumerState<UserCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: GestureDetector(
+              onTapDown: (_) => _animationController.forward(),
+              onTapUp: (_) => _animationController.reverse(),
+              onTapCancel: () => _animationController.reverse(),
+              onTap: widget.isEnabled
+                  ? () => _showUserDetail(context, ref)
+                  : null,
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: DSTokens.spaceL,
+                  vertical: DSTokens.spaceS,
+                ),
+                decoration: BoxDecoration(
+                  color: ref.colors.surface,
+                  borderRadius: BorderRadius.circular(
+                    DSTokens.radiusL,
+                  ), // Increased radius
+                  border: Border.all(
+                    color: _isHovered
+                        ? _getRoleColor(widget.user.role).withValues(alpha: 0.3)
+                        : ref.colors.border,
+                    width: _isHovered ? 2 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: DSColors.black.withValues(
+                        alpha: _isHovered ? 0.08 : 0.02,
+                      ),
+                      blurRadius: _isHovered ? 8 : 4,
+                      offset: Offset(0, _isHovered ? 4 : 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(DSTokens.spaceL),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // User header (name, email, current user badge)
+                      _buildUserHeader(ref),
+                      const SizedBox(
+                        height: DSTokens.spaceL,
+                      ), // Increased spacing
+                      // User details (role, status, actions)
+                      _buildUserDetails(ref),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -69,17 +124,18 @@ class UserCard extends ConsumerWidget {
     final authState = ref.read(authProvider);
     final currentUser = authState.domainUser;
     final canManageUser =
-        currentUser?.canViewAllUsers == true && currentUser?.uid != user.uid;
+        currentUser?.canViewAllUsers == true &&
+        currentUser?.uid != widget.user.uid;
 
     showDialog(
       context: context,
       builder: (context) => UserDetailDialog(
-        user: user,
+        user: widget.user,
         onRoleChanged: canManageUser && currentUser?.canChangeRoles == true
-            ? onRoleChanged
+            ? widget.onRoleChanged
             : null,
         onStatusChanged: canManageUser && currentUser?.canVerifyUsers == true
-            ? onStatusChanged
+            ? widget.onStatusChanged
             : null,
       ),
     );
@@ -88,85 +144,72 @@ class UserCard extends ConsumerWidget {
   Widget _buildUserHeader(WidgetRef ref) {
     return Row(
       children: [
-        // Avatar placeholder
+        // Enhanced Avatar with better styling
         Container(
-          width: 48,
-          height: 48,
+          width: 56, // Increased size
+          height: 56,
           decoration: BoxDecoration(
-            color: _getRoleColor(user.role).withOpacity(0.1),
+            gradient: LinearGradient(
+              colors: [
+                _getRoleColor(widget.user.role).withValues(alpha: 0.1),
+                _getRoleColor(widget.user.role).withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: _getRoleColor(user.role).withOpacity(0.3),
+              color: _getRoleColor(widget.user.role).withValues(alpha: 0.3),
               width: 2,
             ),
           ),
           child: Center(
             child: Text(
-              user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-              style: DSTypography.headlineMedium.copyWith(
-                color: _getRoleColor(user.role),
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
+              widget.user.name.isNotEmpty
+                  ? widget.user.name[0].toUpperCase()
+                  : 'U',
+              style: DSTypography.headlineLarge.copyWith(
+                color: _getRoleColor(widget.user.role),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ),
-        const SizedBox(width: DSTokens.spaceM),
+        const SizedBox(width: DSTokens.spaceL),
 
-        // User info
+        // User info - improved layout
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Flexible(
+                  Expanded(
                     child: Text(
-                      user.name,
+                      widget.user.name,
                       style: DSTypography.headlineMedium.copyWith(
                         color: ref.colors.textPrimary,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (isCurrentUser) ...[
+                  if (widget.isCurrentUser) ...[
                     const SizedBox(width: DSTokens.spaceS),
                     _buildCurrentUserBadge(ref),
                   ],
-                  const Spacer(),
-                  // Delete button (only icon)
-                  if (onDelete != null && !isCurrentUser)
-                    GestureDetector(
-                      onTap: isEnabled ? onDelete : null,
-                      child: Container(
-                        padding: const EdgeInsets.all(DSTokens.spaceS),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(DSTokens.radiusS),
-                          border: Border.all(
-                            color: const Color(0xFFEF4444).withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 16,
-                          color: const Color(
-                            0xFFEF4444,
-                          ).withOpacity(isEnabled ? 1.0 : 0.5),
-                        ),
-                      ),
-                    ),
                 ],
               ),
               const SizedBox(height: DSTokens.spaceXS),
               Text(
-                user.email,
+                widget.user.email,
                 style: DSTypography.bodyMedium.copyWith(
                   color: ref.colors.textSecondary,
                   fontSize: 14,
+                  letterSpacing: 0.1,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -203,25 +246,110 @@ class UserCard extends ConsumerWidget {
   }
 
   Widget _buildUserDetails(WidgetRef ref) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Role badge
-        _buildBadge(
-          ref,
-          user.role.value.toUpperCase(),
-          _getRoleColor(user.role),
-          Icons.admin_panel_settings_rounded,
-        ),
-        const SizedBox(width: DSTokens.spaceM),
+        // Role and Status badges
+        Row(
+          children: [
+            // Role badge
+            _buildBadge(
+              ref,
+              widget.user.role.value.toUpperCase(),
+              _getRoleColor(widget.user.role),
+              Icons.admin_panel_settings_rounded,
+            ),
+            const SizedBox(width: DSTokens.spaceM),
 
-        // Status badge
-        _buildBadge(
-          ref,
-          user.status.value.toUpperCase(),
-          _getStatusColor(user.status),
-          _getStatusIcon(user.status),
+            // Status badge
+            _buildBadge(
+              ref,
+              widget.user.status.value.toUpperCase(),
+              _getStatusColor(widget.user.status),
+              _getStatusIcon(widget.user.status),
+            ),
+
+            const Spacer(),
+
+            // Action buttons - moved to bottom area for better UX
+            if (widget.onDelete != null && !widget.isCurrentUser)
+              _buildActionButton(
+                ref,
+                icon: Icons.delete_outline,
+                color: DSColors.error,
+                onTap: widget.isEnabled ? widget.onDelete : null,
+                tooltip: 'Delete user',
+              ),
+          ],
         ),
+
+        // Additional info section (can be expanded later)
+        if (_shouldShowAdditionalInfo()) ...[
+          const SizedBox(height: DSTokens.spaceM),
+          _buildAdditionalInfo(ref),
+        ],
       ],
+    );
+  }
+
+  bool _shouldShowAdditionalInfo() {
+    // Show additional info for current user or when hovered
+    return widget.isCurrentUser || _isHovered;
+  }
+
+  Widget _buildAdditionalInfo(WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.all(DSTokens.spaceM),
+      decoration: BoxDecoration(
+        color: ref.colors.surfaceContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(DSTokens.radiusS),
+        border: Border.all(color: ref.colors.border.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 16, color: ref.colors.textTertiary),
+          const SizedBox(width: DSTokens.spaceS),
+          Expanded(
+            child: Text(
+              widget.isCurrentUser
+                  ? 'This is your account'
+                  : 'Tap to view details',
+              style: DSTypography.bodySmall.copyWith(
+                color: ref.colors.textTertiary,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    WidgetRef ref, {
+    required IconData icon,
+    required Color color,
+    required VoidCallback? onTap,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(DSTokens.spaceS),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(DSTokens.radiusS),
+            border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: color.withValues(alpha: widget.isEnabled ? 1.0 : 0.5),
+          ),
+        ),
+      ),
     );
   }
 
@@ -232,21 +360,29 @@ class UserCard extends ConsumerWidget {
         vertical: DSTokens.spaceS,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(DSTokens.radiusS),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.15),
+            color.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(DSTokens.radiusM), // More rounded
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          Icon(icon, size: 16, color: color),
           const SizedBox(width: DSTokens.spaceS),
           Text(
             label,
             style: DSTypography.labelMedium.copyWith(
               color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
         ],

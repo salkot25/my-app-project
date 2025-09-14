@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../design_system/design_system.dart';
-import '../../core/errors/failures.dart';
-import '../../domain/entities/user.dart';
-import '../providers/auth_provider.dart';
-import '../providers/user_list_provider.dart';
-import 'user_list/widgets/user_search_section.dart';
-import 'user_list/widgets/user_card.dart';
-import 'user_list/widgets/user_dialogs.dart';
-import 'user_list/widgets/user_list_states.dart';
-import 'user_list/widgets/user_stats_card.dart';
+import '../../../design_system/design_system.dart';
+import '../../../core/errors/failures.dart';
+import '../../../domain/entities/user.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/user_list_provider.dart';
+import 'widgets/user_search_section.dart';
+import 'widgets/user_card.dart';
+import 'widgets/user_dialogs.dart';
+import 'widgets/user_list_states.dart';
+import 'widgets/user_stats_card.dart';
 
 class UserListScreen extends ConsumerStatefulWidget {
   const UserListScreen({super.key});
@@ -217,6 +217,63 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Header Section - same style as Profile Screen
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                DSTokens.spaceL,
+                DSTokens.spaceL,
+                DSTokens.spaceL,
+                0,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Users',
+                          style: DSTypography.displaySmall.copyWith(
+                            color: ref.colors.textPrimary,
+                            fontWeight: DSTokens.fontWeightBold,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        const SizedBox(height: DSTokens.spaceXS),
+                        Text(
+                          'Manage user accounts and permissions',
+                          style: DSTypography.bodyLarge.copyWith(
+                            color: ref.colors.textSecondary,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Refresh button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: ref.colors.surfaceContainer,
+                      borderRadius: BorderRadius.circular(DSTokens.radiusL),
+                      border: Border.all(color: ref.colors.border, width: 1),
+                    ),
+                    child: IconButton(
+                      onPressed: _isPerformingAction ? null : _handleRefresh,
+                      icon: Icon(
+                        Icons.refresh_rounded,
+                        color: _isPerformingAction
+                            ? ref.colors.textTertiary
+                            : ref.colors.textSecondary,
+                        size: DSTokens.fontL,
+                      ),
+                      tooltip: 'Refresh users',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: DSTokens.spaceL),
             // Stats Card - moved to top
             userListState.isLoading
                 ? Container()

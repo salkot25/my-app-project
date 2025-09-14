@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
-import '../../../../design_system/utils/theme_colors.dart';
-import '../../../../design_system/providers/theme_provider.dart';
 import '../../../../domain/entities/user.dart';
 
 /// Dark Mode Optimized ProfileHeader following senior UX principles:

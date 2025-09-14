@@ -7,6 +7,7 @@ import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
 import '../../offline/offline_demo_screen.dart';
 import '../../permissions/permission_management_screen.dart';
+import '../../user_list/user_list_screen.dart';
 
 /// Enhanced ProfileActions with senior UX principles:
 /// 1. Better information architecture with logical grouping
@@ -355,37 +356,10 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
     );
   }
 
-  void _showManageUsersInfo() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.info_outline_rounded,
-              color: DSColors.textOnColor,
-              size: DSTokens.fontM,
-            ),
-            const SizedBox(width: DSTokens.spaceS),
-            Expanded(
-              child: Text(
-                'Users management is available in the Users tab at the bottom navigation',
-                style: DSTypography.bodyMedium.copyWith(
-                  color: DSColors.textOnColor,
-                  fontWeight: DSTokens.fontWeightMedium,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: DSColors.info,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(DSTokens.spaceM),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DSTokens.radiusM),
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+  void _navigateToUserList() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const UserListScreen()));
   }
 
   void _showThemeBottomSheet(BuildContext context, WidgetRef ref) {
@@ -768,29 +742,13 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
               _buildMenuTile(
                 icon: Icons.people_outline_rounded,
                 title: 'Manage Users',
-                subtitle: 'Available in Users tab below',
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: DSTokens.spaceS,
-                    vertical: DSTokens.spaceXS,
-                  ),
-                  decoration: BoxDecoration(
-                    color: DSColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(DSTokens.radiusS),
-                    border: Border.all(
-                      color: DSColors.info.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    'Users Tab',
-                    style: DSTypography.labelSmall.copyWith(
-                      color: DSColors.info,
-                      fontWeight: DSTokens.fontWeightMedium,
-                    ),
-                  ),
+                subtitle: 'View and manage user accounts',
+                trailing: Icon(
+                  Icons.chevron_right_rounded,
+                  color: ref.colors.textTertiary,
+                  size: DSTokens.fontL,
                 ),
-                onTap: _showManageUsersInfo,
+                onTap: _navigateToUserList,
               ),
 
               _buildSectionDivider(),

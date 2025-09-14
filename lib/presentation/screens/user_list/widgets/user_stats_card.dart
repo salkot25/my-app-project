@@ -92,7 +92,11 @@ class UserStatsCard extends ConsumerWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.all(DSTokens.spaceL),
+        height: 100, // Fixed height untuk bentuk kotak persegi
+        padding: const EdgeInsets.symmetric(
+          horizontal: DSTokens.spaceM,
+          vertical: DSTokens.spaceS,
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? color.withValues(alpha: isDark ? 0.15 : 0.1)
@@ -121,18 +125,18 @@ class UserStatsCard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Simple icon
+            // Icon yang lebih kompak
             Container(
-              padding: const EdgeInsets.all(DSTokens.spaceS),
+              padding: const EdgeInsets.all(DSTokens.spaceXS),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: isDark ? 0.15 : 0.1),
-                borderRadius: BorderRadius.circular(DSTokens.spaceS),
+                borderRadius: BorderRadius.circular(DSTokens.spaceXS),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 18),
             ),
-            const SizedBox(height: DSTokens.spaceM),
+            const SizedBox(height: DSTokens.spaceXS),
 
-            // Count with animated appearance
+            // Count with animated appearance - ukuran lebih kecil
             TweenAnimationBuilder<int>(
               duration: const Duration(milliseconds: 800),
               tween: IntTween(begin: 0, end: count),
@@ -140,23 +144,23 @@ class UserStatsCard extends ConsumerWidget {
               builder: (context, animatedCount, child) {
                 return Text(
                   animatedCount.toString(),
-                  style: DSTypography.headlineLarge.copyWith(
+                  style: DSTypography.headlineMedium.copyWith(
                     color: isSelected ? color : colorScheme.onSurface,
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.w700,
                     height: 1.0,
                   ),
                 );
               },
             ),
-            const SizedBox(height: DSTokens.spaceXS),
+            const SizedBox(height: 2),
 
-            // Title below count (centered, no subtitle)
+            // Title - ukuran font sedikit dikurangi
             Text(
               label,
-              style: DSTypography.labelMedium.copyWith(
+              style: DSTypography.labelSmall.copyWith(
                 color: color,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
             ),

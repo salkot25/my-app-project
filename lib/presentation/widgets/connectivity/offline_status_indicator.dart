@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../../../core/services/offline_sync_service.dart';
 import '../../../design_system/design_system.dart';
-import '../../../design_system/utils/theme_colors.dart';
 
 /// Widget that displays current connectivity status and offline sync information
 class OfflineStatusIndicator extends ConsumerWidget {

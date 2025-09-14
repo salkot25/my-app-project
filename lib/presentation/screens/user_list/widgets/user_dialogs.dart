@@ -77,7 +77,7 @@ class _RoleSelectionDialog extends ConsumerWidget {
           const SizedBox(height: DSTokens.spaceL),
           ...UserRole.values.map((role) {
             return _buildRoleOption(context, ref, role);
-          }).toList(),
+          }),
         ],
       ),
       actions: [
@@ -250,7 +250,7 @@ class _StatusSelectionDialog extends ConsumerWidget {
           const SizedBox(height: DSTokens.spaceL),
           ...UserStatus.values.map((status) {
             return _buildStatusOption(context, ref, status);
-          }).toList(),
+          }),
         ],
       ),
       actions: [
