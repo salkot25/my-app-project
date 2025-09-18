@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/entities/user_role.dart';
 
 class PasswordChangeDialog extends ConsumerStatefulWidget {
   final User currentUser;

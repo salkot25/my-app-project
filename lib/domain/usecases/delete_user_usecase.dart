@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import '../entities/user_role.dart';
 import '../repositories/user_repository.dart';
 import '../../core/errors/failures.dart';
 

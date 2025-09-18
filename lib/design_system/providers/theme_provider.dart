@@ -99,9 +99,8 @@ class ThemeNotifier extends AsyncNotifier<AppThemeMode> {
     state = AsyncValue.data(themeMode);
     await _saveThemeMode(themeMode);
 
-    // Force invalidation of dependent providers to ensure UI updates
-    ref.invalidate(flutterThemeModeProvider);
-    ref.invalidate(isDarkModeProvider);
+    // Note: Removed manual invalidation to prevent circular dependency
+    // Riverpod will automatically update dependent providers
   }
 
   /// Toggle between light and dark mode (skips system)

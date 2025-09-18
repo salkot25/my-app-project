@@ -1,6 +1,8 @@
 import 'package:either_dart/either.dart';
 import '../../core/errors/failures.dart';
 import '../entities/user.dart';
+import '../entities/user_role.dart';
+import '../entities/user_status.dart';
 
 /// User repository interface for managing user data
 abstract class UserRepository {

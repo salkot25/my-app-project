@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 import '../../domain/usecases/get_users_usecase.dart';
 import '../../domain/usecases/verify_user_usecase.dart';
 import '../../domain/usecases/delete_user_usecase.dart';

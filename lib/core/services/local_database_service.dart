@@ -3,7 +3,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/user_model.dart';
-import '../errors/failures.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 
 /// Local database service for offline data storage
 class LocalDatabaseService {

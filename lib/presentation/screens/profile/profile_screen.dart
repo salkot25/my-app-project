@@ -34,29 +34,36 @@ class ProfileScreen extends ConsumerWidget {
       return Scaffold(
         backgroundColor: ref.colors.background,
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_off_rounded,
-                size: DSTokens.spaceXXL + DSTokens.spaceL, // 72px
-                color: ref.colors.textTertiary,
-              ),
-              const SizedBox(height: DSTokens.spaceL),
-              Text(
-                'No user data available',
-                style: DSTypography.headlineSmall.copyWith(
-                  color: ref.colors.textSecondary,
+          child: DSAnimations.fadeIn(
+            duration: DSAnimations.slow,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DSAnimations.scaleIn(
+                  duration: const Duration(milliseconds: 600),
+                  curve: DSAnimations.bounce,
+                  child: Icon(
+                    Icons.person_off_rounded,
+                    size: DSTokens.spaceXXL + DSTokens.spaceL, // 72px
+                    color: ref.colors.textTertiary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: DSTokens.spaceS),
-              Text(
-                'Please login to view your profile',
-                style: DSTypography.bodyMedium.copyWith(
-                  color: ref.colors.textTertiary,
+                const SizedBox(height: DSTokens.spaceL),
+                Text(
+                  'No user data available',
+                  style: DSTypography.headlineSmall.copyWith(
+                    color: ref.colors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: DSTokens.spaceS),
+                Text(
+                  'Please login to view your profile',
+                  style: DSTypography.bodyMedium.copyWith(
+                    color: ref.colors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -72,36 +79,53 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Section with modern spacing
-                Text(
-                  'Profile',
-                  style: DSTypography.displaySmall.copyWith(
-                    color: ref.colors.textPrimary,
-                    fontWeight: DSTokens.fontWeightBold,
-                    letterSpacing: -1,
+                // Header Section with modern spacing - Animated fade in
+                DSAnimations.fadeIn(
+                  child: Text(
+                    'Profile',
+                    style: DSTypography.displaySmall.copyWith(
+                      color: ref.colors.textPrimary,
+                      fontWeight: DSTokens.fontWeightBold,
+                      letterSpacing: -1,
+                    ),
                   ),
                 ),
                 const SizedBox(height: DSTokens.spaceXS),
-                Text(
-                  'Manage your account settings and preferences',
-                  style: DSTypography.bodyLarge.copyWith(
-                    color: ref.colors.textSecondary,
-                    letterSpacing: 0.1,
+
+                // Description with fade in animation
+                DSAnimations.fadeIn(
+                  duration: const Duration(milliseconds: 400),
+                  child: Text(
+                    'Manage your account settings and preferences',
+                    style: DSTypography.bodyLarge.copyWith(
+                      color: ref.colors.textSecondary,
+                      letterSpacing: 0.1,
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: DSTokens.spaceXL),
 
-                // Profile Header
-                ProfileHeader(
-                  currentUser: currentUser,
-                  onTap: showProfileDetailDialog,
+                // Profile Header - Slide in from bottom
+                DSAnimations.slideIn(
+                  begin: const Offset(0, 0.3), // Start from slightly below
+                  duration: const Duration(milliseconds: 500),
+                  curve: DSAnimations.easeOut,
+                  child: ProfileHeader(
+                    currentUser: currentUser,
+                    onTap: showProfileDetailDialog,
+                  ),
                 ),
 
                 const SizedBox(height: DSTokens.spaceL),
 
-                // Profile Actions
-                ProfileActions(currentUser: currentUser),
+                // Profile Actions - Scale in animation
+                DSAnimations.scaleIn(
+                  duration: const Duration(milliseconds: 600),
+                  curve: DSAnimations.spring,
+                  begin: 0.9,
+                  child: ProfileActions(currentUser: currentUser),
+                ),
 
                 const SizedBox(height: DSTokens.spaceXXL),
               ],

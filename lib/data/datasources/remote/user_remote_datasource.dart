@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/errors/failures.dart';
+import '../../../domain/entities/user_role.dart';
+import '../../../domain/entities/user_status.dart';
 import '../../models/user_model.dart';
 
 /// Remote data source for Firestore user data

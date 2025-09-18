@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../design_system/design_system.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/entities/user_role.dart';
+import '../../../../domain/entities/user_status.dart';
+import '../../../../design_system/utils/role_colors.dart';
+import '../../../../design_system/utils/status_utils.dart';
 import 'user_dialogs.dart';
 
 class UserDetailDialog extends ConsumerStatefulWidget {
@@ -111,50 +114,6 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
     }
   }
 
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return DSColors.error;
-      case UserRole.moderator:
-        return DSColors.brandPrimary;
-      case UserRole.user:
-        return DSColors.textSecondary;
-    }
-  }
-
-  IconData _getRoleIcon(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return Icons.admin_panel_settings_rounded;
-      case UserRole.moderator:
-        return Icons.verified_user_rounded;
-      case UserRole.user:
-        return Icons.person_rounded;
-    }
-  }
-
-  Color _getStatusColor(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return DSColors.success;
-      case UserStatus.unverified:
-        return DSColors.warning;
-      case UserStatus.suspended:
-        return DSColors.error;
-    }
-  }
-
-  IconData _getStatusIcon(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return Icons.check_circle_rounded;
-      case UserStatus.unverified:
-        return Icons.pending_rounded;
-      case UserStatus.suspended:
-        return Icons.block_rounded;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -182,8 +141,10 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    _getRoleColor(currentUser.role),
-                    _getRoleColor(currentUser.role).withValues(alpha: 0.8),
+                    RoleColors.getRoleColor(currentUser.role),
+                    RoleColors.getRoleColor(
+                      currentUser.role,
+                    ).withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -270,7 +231,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                                   ? currentUser.name[0].toUpperCase()
                                   : 'U',
                               style: DSTypography.displayLarge.copyWith(
-                                color: _getRoleColor(currentUser.role),
+                                color: RoleColors.getRoleColor(
+                                  currentUser.role,
+                                ),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -1,
                               ),
@@ -327,15 +290,19 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      _getRoleIcon(currentUser.role),
+                                      RoleColors.getRoleIcon(currentUser.role),
                                       size: DSTokens.fontS,
-                                      color: _getRoleColor(currentUser.role),
+                                      color: RoleColors.getRoleColor(
+                                        currentUser.role,
+                                      ),
                                     ),
                                     const SizedBox(width: DSTokens.spaceXS),
                                     Text(
                                       currentUser.role.value.toUpperCase(),
                                       style: DSTypography.labelSmall.copyWith(
-                                        color: _getRoleColor(currentUser.role),
+                                        color: RoleColors.getRoleColor(
+                                          currentUser.role,
+                                        ),
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.6,
                                       ),
@@ -346,7 +313,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                                       Icon(
                                         Icons.edit_rounded,
                                         size: 12,
-                                        color: _getRoleColor(currentUser.role),
+                                        color: RoleColors.getRoleColor(
+                                          currentUser.role,
+                                        ),
                                       ),
                                     ],
                                   ],
@@ -365,7 +334,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                                   vertical: DSTokens.spaceXS,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: _getStatusColor(currentUser.status),
+                                  color: StatusUtils.getStatusColor(
+                                    currentUser.status,
+                                  ),
                                   borderRadius: BorderRadius.circular(
                                     DSTokens.spaceM,
                                   ),
@@ -382,7 +353,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      _getStatusIcon(currentUser.status),
+                                      StatusUtils.getStatusIcon(
+                                        currentUser.status,
+                                      ),
                                       size: DSTokens.fontS,
                                       color: DSColors.white,
                                     ),
@@ -429,7 +402,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                       'Email Address',
                       currentUser.email,
                       Icons.email_rounded,
-                      _getRoleColor(currentUser.role),
+                      RoleColors.getRoleColor(currentUser.role),
                     ),
 
                     const SizedBox(height: DSTokens.spaceM),
@@ -437,9 +410,9 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                     // Status Details
                     _buildDetailRow(
                       'Status Details',
-                      _getStatusDescription(currentUser.status),
-                      _getStatusIcon(currentUser.status),
-                      _getStatusColor(currentUser.status),
+                      StatusUtils.getStatusDescription(currentUser.status),
+                      StatusUtils.getStatusIcon(currentUser.status),
+                      StatusUtils.getStatusColor(currentUser.status),
                     ),
 
                     const SizedBox(height: DSTokens.spaceM),
@@ -449,7 +422,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                       'Member Since',
                       '${currentUser.createdAt.day}/${currentUser.createdAt.month}/${currentUser.createdAt.year}',
                       Icons.calendar_today_rounded,
-                      _getRoleColor(currentUser.role),
+                      RoleColors.getRoleColor(currentUser.role),
                     ),
 
                     const SizedBox(height: DSTokens.spaceM),
@@ -459,7 +432,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                       'Last Updated',
                       '${currentUser.updatedAt.day}/${currentUser.updatedAt.month}/${currentUser.updatedAt.year}',
                       Icons.update_rounded,
-                      _getRoleColor(currentUser.role),
+                      RoleColors.getRoleColor(currentUser.role),
                     ),
 
                     const SizedBox(height: DSTokens.spaceM),
@@ -477,8 +450,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
   }
 
   Widget _buildRolePermissionCard() {
-    final roleColor = _getRoleColor(currentUser.role);
-    final permissions = _getRolePermissions(currentUser.role);
+    final roleColor = RoleColors.getRoleColor(currentUser.role);
 
     return Container(
       padding: const EdgeInsets.all(DSTokens.spaceL),
@@ -500,7 +472,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
                   borderRadius: BorderRadius.circular(DSTokens.spaceS),
                 ),
                 child: Icon(
-                  _getRoleIcon(currentUser.role),
+                  RoleColors.getRoleIcon(currentUser.role),
                   color: roleColor,
                   size: DSTokens.fontL,
                 ),
@@ -537,7 +509,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
 
           // Description
           Text(
-            _getRoleDescription(currentUser.role),
+            RoleColors.getRoleDescription(currentUser.role),
             style: DSTypography.bodySmall.copyWith(
               color: ref.colors.textSecondary,
               height: 1.4,
@@ -558,7 +530,7 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
 
           const SizedBox(height: DSTokens.spaceS),
 
-          ...permissions.map(
+          ...RoleColors.getRolePermissions(currentUser.role).map(
             (permission) => Padding(
               padding: const EdgeInsets.only(bottom: DSTokens.spaceXS),
               child: Row(
@@ -581,57 +553,6 @@ class _UserDetailDialogState extends ConsumerState<UserDetailDialog> {
         ],
       ),
     );
-  }
-
-  List<String> _getRolePermissions(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return [
-          'Full system administration access',
-          'Manage all user accounts and roles',
-          'Access to system configuration',
-          'View all application data',
-          'Manage content and moderation',
-          'System backup and maintenance',
-        ];
-      case UserRole.moderator:
-        return [
-          'Content moderation and review',
-          'User verification and status management',
-          'Community guidelines enforcement',
-          'Report management and resolution',
-          'Basic user account management',
-        ];
-      case UserRole.user:
-        return [
-          'Standard application features',
-          'Personal profile management',
-          'Content creation and sharing',
-          'Basic community interaction',
-        ];
-    }
-  }
-
-  String _getRoleDescription(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return 'Full system access and user management';
-      case UserRole.moderator:
-        return 'Content moderation and user verification';
-      case UserRole.user:
-        return 'Standard user access and features';
-    }
-  }
-
-  String _getStatusDescription(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return 'Account is verified and fully active';
-      case UserStatus.unverified:
-        return 'Account pending verification';
-      case UserStatus.suspended:
-        return 'Account access has been suspended';
-    }
   }
 
   Widget _buildDetailRow(

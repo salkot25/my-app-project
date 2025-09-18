@@ -4,6 +4,8 @@ import 'package:either_dart/either.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:my_project/core/errors/failures.dart';
 import 'package:my_project/domain/entities/user.dart';
+import 'package:my_project/domain/entities/user_role.dart';
+import 'package:my_project/domain/entities/user_status.dart';
 import 'package:my_project/domain/repositories/auth_repository.dart';
 import 'package:my_project/domain/repositories/user_repository.dart';
 import 'package:my_project/domain/usecases/register_usecase.dart';

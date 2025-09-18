@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../../design_system/utils/role_colors.dart';
 import '../../offline/offline_demo_screen.dart';
 import '../../permissions/permission_management_screen.dart';
 import '../../user_list/user_list_screen.dart';
 
-/// Enhanced ProfileActions with senior UX principles:
-/// 1. Better information architecture with logical grouping
+/// Minimalist ProfileActions with clean design:
+/// 1. Removed card container for cleaner appearance
 /// 2. Enhanced accessibility and usability
 /// 3. Optimized dark mode support
 /// 4. Micro-interactions for better feedback
@@ -47,17 +47,6 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return DSColors.error;
-      case UserRole.moderator:
-        return DSColors.brandPrimary;
-      case UserRole.user:
-        return DSColors.textSecondary;
-    }
   }
 
   void _showAboutDialog() {
@@ -363,7 +352,7 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
   }
 
   void _showThemeBottomSheet(BuildContext context, WidgetRef ref) {
-    final currentTheme = ref.read(themeModeProvider);
+    final currentTheme = ref.watch(themeModeProvider);
 
     showModalBottomSheet(
       context: context,
@@ -399,14 +388,15 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
                   Container(
                     padding: const EdgeInsets.all(DSTokens.spaceS),
                     decoration: BoxDecoration(
-                      color: _getRoleColor(
+                      color: RoleColors.getRoleColorWithAlpha(
                         widget.currentUser.role,
-                      ).withValues(alpha: 0.1),
+                        0.1,
+                      ),
                       borderRadius: BorderRadius.circular(DSTokens.radiusM),
                     ),
                     child: Icon(
                       Icons.palette_rounded,
-                      color: _getRoleColor(widget.currentUser.role),
+                      color: RoleColors.getRoleColor(widget.currentUser.role),
                       size: DSTokens.fontL,
                     ),
                   ),
@@ -483,12 +473,12 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
     return Container(
       decoration: BoxDecoration(
         color: isSelected
-            ? _getRoleColor(widget.currentUser.role).withValues(alpha: 0.1)
+            ? RoleColors.getRoleColorWithAlpha(widget.currentUser.role, 0.1)
             : ref.colors.surfaceContainer.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(DSTokens.radiusL),
         border: Border.all(
           color: isSelected
-              ? _getRoleColor(widget.currentUser.role).withValues(alpha: 0.3)
+              ? RoleColors.getRoleColorWithAlpha(widget.currentUser.role, 0.3)
               : ref.colors.border,
           width: 1,
         ),
@@ -521,7 +511,9 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
                       ),
                     ],
                   ),
-                  backgroundColor: _getRoleColor(widget.currentUser.role),
+                  backgroundColor: RoleColors.getRoleColor(
+                    widget.currentUser.role,
+                  ),
                   behavior: SnackBarBehavior.floating,
                   margin: const EdgeInsets.all(DSTokens.spaceM),
                   shape: RoundedRectangleBorder(
@@ -541,16 +533,17 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
                   padding: const EdgeInsets.all(DSTokens.spaceS),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? _getRoleColor(
+                        ? RoleColors.getRoleColorWithAlpha(
                             widget.currentUser.role,
-                          ).withValues(alpha: 0.2)
+                            0.2,
+                          )
                         : ref.colors.textSecondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(DSTokens.radiusM),
                   ),
                   child: Icon(
                     themeMode.icon,
                     color: isSelected
-                        ? _getRoleColor(widget.currentUser.role)
+                        ? RoleColors.getRoleColor(widget.currentUser.role)
                         : ref.colors.textSecondary,
                     size: DSTokens.fontL,
                   ),
@@ -564,7 +557,7 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
                         themeMode.displayName,
                         style: DSTypography.bodyLarge.copyWith(
                           color: isSelected
-                              ? _getRoleColor(widget.currentUser.role)
+                              ? RoleColors.getRoleColor(widget.currentUser.role)
                               : ref.colors.textPrimary,
                           fontWeight: isSelected
                               ? DSTokens.fontWeightBold
@@ -588,7 +581,7 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
                   Container(
                     padding: const EdgeInsets.all(DSTokens.spaceXS),
                     decoration: BoxDecoration(
-                      color: _getRoleColor(widget.currentUser.role),
+                      color: RoleColors.getRoleColor(widget.currentUser.role),
                       borderRadius: BorderRadius.circular(DSTokens.radiusS),
                     ),
                     child: Icon(
@@ -640,167 +633,155 @@ class _ProfileActionsState extends ConsumerState<ProfileActions>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: ref.colors.surface,
-          borderRadius: BorderRadius.circular(DSTokens.radiusL),
-          // Cleaner approach: Remove border for minimal appearance
-          boxShadow: [
-            BoxShadow(
-              color: ref.colors.shadowColor.withValues(alpha: 0.15),
-              blurRadius: DSTokens.spaceXS,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Settings Section
-            _buildSectionHeader('Settings', Icons.settings_rounded),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Settings Section
+          _buildSectionHeader('Settings', Icons.settings_rounded),
 
-            _buildMenuTile(
-              icon: Icons.notifications_outlined,
-              title: 'Push Notifications',
-              subtitle: 'Receive updates and alerts',
-              trailing: Switch.adaptive(
-                value: _notificationsEnabled,
-                onChanged: _toggleNotifications,
-                activeThumbColor: _getRoleColor(widget.currentUser.role),
-                activeTrackColor: _getRoleColor(
-                  widget.currentUser.role,
-                ).withValues(alpha: 0.3),
-                inactiveThumbColor: ref.colors.textTertiary,
-                inactiveTrackColor: ref.colors.surfaceContainer,
+          _buildMenuTile(
+            icon: Icons.notifications_outlined,
+            title: 'Push Notifications',
+            subtitle: 'Receive updates and alerts',
+            trailing: Switch.adaptive(
+              value: _notificationsEnabled,
+              onChanged: _toggleNotifications,
+              activeThumbColor: RoleColors.getRoleColor(
+                widget.currentUser.role,
               ),
-              onTap: null, // Switch handles the interaction
-            ),
-
-            const SizedBox(height: DSTokens.spaceS),
-
-            // Theme Selection
-            _buildMenuTile(
-              icon: ref.watch(themeModeProvider).icon,
-              title: 'Theme Mode',
-              subtitle: ref.watch(themeModeProvider).displayName,
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: ref.colors.textTertiary,
-                size: DSTokens.fontL,
+              activeTrackColor: RoleColors.getRoleColorWithAlpha(
+                widget.currentUser.role,
+                0.3,
               ),
-              onTap: () => _showThemeBottomSheet(context, ref),
+              inactiveThumbColor: ref.colors.textTertiary,
+              inactiveTrackColor: ref.colors.surfaceContainer,
             ),
+            onTap: null, // Switch handles the interaction
+          ),
 
-            const SizedBox(height: DSTokens.spaceS),
+          const SizedBox(height: DSTokens.spaceS),
 
-            _buildMenuTile(
-              icon: Icons.security_rounded,
-              title: 'App Permissions',
-              subtitle: 'Manage app permissions and privacy settings',
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: ref.colors.textTertiary,
-                size: DSTokens.fontL,
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const PermissionManagementScreen(),
-                  ),
-                );
-              },
+          // Theme Selection
+          _buildMenuTile(
+            icon: ref.watch(themeModeProvider).icon,
+            title: 'Theme Mode',
+            subtitle: ref.watch(themeModeProvider).displayName,
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: ref.colors.textTertiary,
+              size: DSTokens.fontL,
             ),
+            onTap: () => _showThemeBottomSheet(context, ref),
+          ),
 
-            _buildMenuTile(
-              icon: Icons.offline_bolt_rounded,
-              title: 'Offline Mode',
-              subtitle: 'Test offline functionality and sync status',
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: ref.colors.textTertiary,
-                size: DSTokens.fontL,
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const OfflineDemoScreen(),
-                  ),
-                );
-              },
+          const SizedBox(height: DSTokens.spaceS),
+
+          _buildMenuTile(
+            icon: Icons.security_rounded,
+            title: 'App Permissions',
+            subtitle: 'Manage app permissions and privacy settings',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: ref.colors.textTertiary,
+              size: DSTokens.fontL,
             ),
-
-            _buildSectionDivider(),
-
-            // Admin Section (Conditional)
-            if (widget.currentUser.canViewAllUsers) ...[
-              _buildSectionHeader(
-                'Administration',
-                Icons.admin_panel_settings_rounded,
-              ),
-
-              _buildMenuTile(
-                icon: Icons.people_outline_rounded,
-                title: 'Manage Users',
-                subtitle: 'View and manage user accounts',
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: ref.colors.textTertiary,
-                  size: DSTokens.fontL,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const PermissionManagementScreen(),
                 ),
-                onTap: _navigateToUserList,
-              ),
+              );
+            },
+          ),
 
-              _buildSectionDivider(),
-            ],
-
-            // Information Section
-            _buildSectionHeader('Information', Icons.info_rounded),
-
-            _buildMenuTile(
-              icon: Icons.info_outline_rounded,
-              title: 'About Application',
-              subtitle: 'Version and app information',
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: ref.colors.textTertiary,
-                size: DSTokens.fontL,
-              ),
-              onTap: _showAboutDialog,
+          _buildMenuTile(
+            icon: Icons.offline_bolt_rounded,
+            title: 'Offline Mode',
+            subtitle: 'Test offline functionality and sync status',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: ref.colors.textTertiary,
+              size: DSTokens.fontL,
             ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const OfflineDemoScreen(),
+                ),
+              );
+            },
+          ),
 
-            _buildSectionDivider(),
+          _buildSectionDivider(),
 
-            // Account Section
+          // Admin Section (Conditional)
+          if (widget.currentUser.canViewAllUsers) ...[
             _buildSectionHeader(
-              'Account',
-              Icons.person_rounded,
-              isDestructive: true,
+              'Administration',
+              Icons.admin_panel_settings_rounded,
             ),
 
             _buildMenuTile(
-              icon: Icons.logout_rounded,
-              title: 'Logout',
-              subtitle: 'Sign out from your account',
-              trailing: Container(
-                padding: const EdgeInsets.all(DSTokens.spaceXS),
-                decoration: BoxDecoration(
-                  color: DSColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(DSTokens.radiusS),
-                ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: DSColors.error,
-                  size: DSTokens.fontM,
-                ),
+              icon: Icons.people_outline_rounded,
+              title: 'Manage Users',
+              subtitle: 'View and manage user accounts',
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: ref.colors.textTertiary,
+                size: DSTokens.fontL,
               ),
-              onTap: _showLogoutConfirmation,
-              isDestructive: true,
+              onTap: _navigateToUserList,
             ),
 
-            const SizedBox(height: DSTokens.spaceS),
+            _buildSectionDivider(),
           ],
-        ),
+
+          // Information Section
+          _buildSectionHeader('Information', Icons.info_rounded),
+
+          _buildMenuTile(
+            icon: Icons.info_outline_rounded,
+            title: 'About Application',
+            subtitle: 'Version and app information',
+            trailing: Icon(
+              Icons.chevron_right_rounded,
+              color: ref.colors.textTertiary,
+              size: DSTokens.fontL,
+            ),
+            onTap: _showAboutDialog,
+          ),
+
+          _buildSectionDivider(),
+
+          // Account Section
+          _buildSectionHeader(
+            'Account',
+            Icons.person_rounded,
+            isDestructive: true,
+          ),
+
+          _buildMenuTile(
+            icon: Icons.logout_rounded,
+            title: 'Logout',
+            subtitle: 'Sign out from your account',
+            trailing: Container(
+              padding: const EdgeInsets.all(DSTokens.spaceXS),
+              decoration: BoxDecoration(
+                color: DSColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(DSTokens.radiusS),
+              ),
+              child: Icon(
+                Icons.logout_rounded,
+                color: DSColors.error,
+                size: DSTokens.fontM,
+              ),
+            ),
+            onTap: _showLogoutConfirmation,
+            isDestructive: true,
+          ),
+
+          const SizedBox(height: DSTokens.spaceS),
+        ],
       ),
     );
   }

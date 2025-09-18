@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../design_system/design_system.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/entities/user_role.dart';
+import '../../../../domain/entities/user_status.dart';
 import 'edit_profile_dialog.dart';
 import 'password_change_dialog.dart';
 

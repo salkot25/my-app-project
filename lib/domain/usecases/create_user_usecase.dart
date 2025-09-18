@@ -1,5 +1,7 @@
 import 'package:either_dart/either.dart';
 import '../entities/user.dart';
+import '../entities/user_role.dart';
+import '../entities/user_status.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/user_repository.dart';
 import '../../core/errors/failures.dart';

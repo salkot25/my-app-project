@@ -5,6 +5,8 @@ import '../../core/services/connectivity_service.dart';
 import '../../core/services/offline_sync_service.dart';
 import '../../core/services/local_database_service.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../data/models/user_model.dart';
 import '../datasources/remote/user_remote_datasource.dart';

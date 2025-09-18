@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 
 /// User data model for Firestore serialization/deserialization
 class UserModel extends User {

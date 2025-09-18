@@ -1,6 +1,8 @@
 import 'package:either_dart/either.dart';
 import '../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasources/remote/user_remote_datasource.dart';
 

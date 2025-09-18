@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/errors/failures.dart';
 import '../../design_system/design_system.dart';
 import '../../domain/entities/user.dart';
 import '../providers/auth_provider.dart';
+import '../../design_system/utils/role_colors.dart';
+import '../../design_system/utils/status_utils.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -98,25 +99,25 @@ class HomeScreen extends ConsumerWidget {
             vertical: DSTokens.spaceS,
           ),
           decoration: BoxDecoration(
-            color: _getRoleColor(currentUser.role).withValues(alpha: 0.1),
+            color: RoleColors.getRoleColorWithAlpha(currentUser.role, 0.1),
             borderRadius: BorderRadius.circular(DSTokens.radiusCircle),
             border: Border.all(
-              color: _getRoleColor(currentUser.role).withValues(alpha: 0.2),
+              color: RoleColors.getRoleColorWithAlpha(currentUser.role, 0.2),
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                _getRoleIcon(currentUser.role),
+                RoleColors.getRoleIcon(currentUser.role),
                 size: DSTokens.spaceM,
-                color: _getRoleColor(currentUser.role),
+                color: RoleColors.getRoleColor(currentUser.role),
               ),
               SizedBox(width: DSTokens.spaceS),
               Text(
                 currentUser.role.value.toUpperCase(),
                 style: DSTypography.labelSmall.copyWith(
-                  color: _getRoleColor(currentUser.role),
+                  color: RoleColors.getRoleColor(currentUser.role),
                 ),
               ),
             ],
@@ -144,7 +145,7 @@ class HomeScreen extends ConsumerWidget {
                 width: DSTokens.spaceXS,
                 height: DSTokens.spaceXL,
                 decoration: BoxDecoration(
-                  color: _getRoleColor(currentUser.role),
+                  color: RoleColors.getRoleColor(currentUser.role),
                   borderRadius: BorderRadius.circular(DSTokens.radiusXS),
                 ),
               ),
@@ -166,7 +167,7 @@ class HomeScreen extends ConsumerWidget {
                 child: _buildStatCard(
                   'Status',
                   currentUser.status.value.toUpperCase(),
-                  _getStatusColor(currentUser.status),
+                  StatusUtils.getStatusColor(currentUser.status),
                   ref,
                 ),
               ),
@@ -289,38 +290,5 @@ class HomeScreen extends ConsumerWidget {
 
     final index = DateTime.now().day % quotes.length;
     return quotes[index];
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return const Color(0xFF8B5CF6); // Modern purple
-      case UserRole.moderator:
-        return const Color(0xFF3B82F6); // Modern blue
-      case UserRole.user:
-        return const Color(0xFF6B7280); // Modern gray
-    }
-  }
-
-  IconData _getRoleIcon(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return Icons.admin_panel_settings_rounded;
-      case UserRole.moderator:
-        return Icons.verified_user_rounded;
-      case UserRole.user:
-        return Icons.person_rounded;
-    }
-  }
-
-  Color _getStatusColor(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return const Color(0xFF10B981); // Modern green
-      case UserStatus.unverified:
-        return const Color(0xFFF59E0B); // Modern amber
-      case UserStatus.suspended:
-        return const Color(0xFFEF4444); // Modern red
-    }
   }
 }

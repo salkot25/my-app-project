@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import '../../core/errors/failures.dart';
 import '../entities/user.dart';
+import '../entities/user_status.dart';
 import '../repositories/user_repository.dart';
 
 /// Use case for verifying a user (admin and moderator only)

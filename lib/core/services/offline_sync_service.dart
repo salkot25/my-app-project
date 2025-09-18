@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/errors/failures.dart';
 import '../../data/datasources/remote/user_remote_datasource.dart';
 import '../../data/models/user_model.dart';
+import '../../domain/entities/user_role.dart';
+import '../../domain/entities/user_status.dart';
 import '../../presentation/providers/auth_provider.dart';
 import 'connectivity_service.dart';
 import 'local_database_service.dart';

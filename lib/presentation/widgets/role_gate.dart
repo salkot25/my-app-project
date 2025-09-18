@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/errors/failures.dart';
+import '../../domain/entities/user_role.dart';
 import '../providers/auth_provider.dart';
 
 /// Widget that restricts access based on user role

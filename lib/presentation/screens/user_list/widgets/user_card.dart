@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../design_system/design_system.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/entities/user_role.dart';
+import '../../../../domain/entities/user_status.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../../design_system/utils/role_colors.dart';
+import '../../../../design_system/utils/status_utils.dart';
 import 'user_detail_dialog.dart';
 
 class UserCard extends ConsumerStatefulWidget {
@@ -83,7 +86,10 @@ class _UserCardState extends ConsumerState<UserCard>
                   ), // Increased radius
                   border: Border.all(
                     color: _isHovered
-                        ? _getRoleColor(widget.user.role).withValues(alpha: 0.3)
+                        ? RoleColors.getRoleColorWithAlpha(
+                            widget.user.role,
+                            0.3,
+                          )
                         : ref.colors.border,
                     width: _isHovered ? 2 : 1,
                   ),
@@ -151,15 +157,15 @@ class _UserCardState extends ConsumerState<UserCard>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                _getRoleColor(widget.user.role).withValues(alpha: 0.1),
-                _getRoleColor(widget.user.role).withValues(alpha: 0.05),
+                RoleColors.getRoleColorWithAlpha(widget.user.role, 0.1),
+                RoleColors.getRoleColorWithAlpha(widget.user.role, 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: _getRoleColor(widget.user.role).withValues(alpha: 0.3),
+              color: RoleColors.getRoleColorWithAlpha(widget.user.role, 0.3),
               width: 2,
             ),
           ),
@@ -169,7 +175,7 @@ class _UserCardState extends ConsumerState<UserCard>
                   ? widget.user.name[0].toUpperCase()
                   : 'U',
               style: DSTypography.headlineLarge.copyWith(
-                color: _getRoleColor(widget.user.role),
+                color: RoleColors.getRoleColor(widget.user.role),
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
@@ -256,7 +262,7 @@ class _UserCardState extends ConsumerState<UserCard>
             _buildBadge(
               ref,
               widget.user.role.value.toUpperCase(),
-              _getRoleColor(widget.user.role),
+              RoleColors.getRoleColor(widget.user.role),
               Icons.admin_panel_settings_rounded,
             ),
             const SizedBox(width: DSTokens.spaceM),
@@ -265,8 +271,8 @@ class _UserCardState extends ConsumerState<UserCard>
             _buildBadge(
               ref,
               widget.user.status.value.toUpperCase(),
-              _getStatusColor(widget.user.status),
-              _getStatusIcon(widget.user.status),
+              StatusUtils.getStatusColor(widget.user.status),
+              StatusUtils.getStatusIcon(widget.user.status),
             ),
 
             const Spacer(),
@@ -388,38 +394,5 @@ class _UserCardState extends ConsumerState<UserCard>
         ],
       ),
     );
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return const Color(0xFFDC2626); // Modern red
-      case UserRole.moderator:
-        return const Color(0xFF3498DB); // Modern blue
-      case UserRole.user:
-        return const Color(0xFF6B7280); // Modern gray
-    }
-  }
-
-  Color _getStatusColor(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return const Color(0xFF10B981); // Modern green
-      case UserStatus.unverified:
-        return const Color(0xFFF59E0B); // Modern amber
-      case UserStatus.suspended:
-        return const Color(0xFFEF4444); // Modern red
-    }
-  }
-
-  IconData _getStatusIcon(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return Icons.verified_outlined;
-      case UserStatus.unverified:
-        return Icons.pending_outlined;
-      case UserStatus.suspended:
-        return Icons.block_outlined;
-    }
   }
 }

@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../design_system/tokens/tokens.dart';
 import '../../../../design_system/tokens/typography.dart';
 import '../../../../design_system/utils/theme_colors.dart';
-import '../../../../core/errors/failures.dart';
 import '../../../../domain/entities/user.dart';
+import '../../../../domain/entities/user_role.dart';
+import '../../../../domain/entities/user_status.dart';
+import '../../../../design_system/utils/role_colors.dart';
+import '../../../../design_system/utils/status_utils.dart';
 
 class UserDialogs {
   static Future<UserRole?> showRoleSelectionDialog(
@@ -93,7 +96,7 @@ class _RoleSelectionDialog extends ConsumerWidget {
 
   Widget _buildRoleOption(BuildContext context, WidgetRef ref, UserRole role) {
     final isCurrentRole = role == user.role;
-    final color = _getRoleColor(role);
+    final color = RoleColors.getRoleColor(role);
 
     return Container(
       margin: const EdgeInsets.only(bottom: DSTokens.spaceS),
@@ -119,7 +122,7 @@ class _RoleSelectionDialog extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.admin_panel_settings_rounded,
+                  RoleColors.getRoleIcon(role),
                   size: 20,
                   color: isCurrentRole ? color : ref.colors.textSecondary,
                 ),
@@ -137,7 +140,7 @@ class _RoleSelectionDialog extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        _getRoleDescription(role),
+                        RoleColors.getRoleDescription(role),
                         style: DSTypography.bodyMedium.copyWith(
                           color: ref.colors.textSecondary,
                           fontSize: 12,
@@ -171,28 +174,6 @@ class _RoleSelectionDialog extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return const Color(0xFFDC2626);
-      case UserRole.moderator:
-        return const Color(0xFF3498DB);
-      case UserRole.user:
-        return const Color(0xFF6B7280);
-    }
-  }
-
-  String _getRoleDescription(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return 'Full system access and user management';
-      case UserRole.moderator:
-        return 'User verification and moderation';
-      case UserRole.user:
-        return 'Standard user access';
-    }
   }
 
   Widget _buildDialogButton(
@@ -270,8 +251,8 @@ class _StatusSelectionDialog extends ConsumerWidget {
     UserStatus status,
   ) {
     final isCurrentStatus = status == user.status;
-    final color = _getStatusColor(status);
-    final icon = _getStatusIcon(status);
+    final color = StatusUtils.getStatusColor(status);
+    final icon = StatusUtils.getStatusIcon(status);
 
     return Container(
       margin: const EdgeInsets.only(bottom: DSTokens.spaceS),
@@ -319,7 +300,7 @@ class _StatusSelectionDialog extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        _getStatusDescription(status),
+                        StatusUtils.getStatusDescription(status),
                         style: DSTypography.bodyMedium.copyWith(
                           color: ref.colors.textSecondary,
                           fontSize: 12,
@@ -353,39 +334,6 @@ class _StatusSelectionDialog extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Color _getStatusColor(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return const Color(0xFF10B981);
-      case UserStatus.unverified:
-        return const Color(0xFFF59E0B);
-      case UserStatus.suspended:
-        return const Color(0xFFEF4444);
-    }
-  }
-
-  IconData _getStatusIcon(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return Icons.verified_outlined;
-      case UserStatus.unverified:
-        return Icons.pending_outlined;
-      case UserStatus.suspended:
-        return Icons.block_outlined;
-    }
-  }
-
-  String _getStatusDescription(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return 'User is verified and can access the system';
-      case UserStatus.unverified:
-        return 'User needs verification to access system';
-      case UserStatus.suspended:
-        return 'User access is suspended';
-    }
   }
 
   Widget _buildDialogButton(
@@ -487,13 +435,13 @@ class _DeleteConfirmationDialog extends ConsumerWidget {
                     _buildInfoChip(
                       ref,
                       user.role.value.toUpperCase(),
-                      _getRoleColor(user.role),
+                      RoleColors.getRoleColor(user.role),
                     ),
                     const SizedBox(width: DSTokens.spaceS),
                     _buildInfoChip(
                       ref,
                       user.status.value.toUpperCase(),
-                      _getStatusColor(user.status),
+                      StatusUtils.getStatusColor(user.status),
                     ),
                   ],
                 ),
@@ -547,28 +495,6 @@ class _DeleteConfirmationDialog extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Color _getRoleColor(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return const Color(0xFFDC2626);
-      case UserRole.moderator:
-        return const Color(0xFF3498DB);
-      case UserRole.user:
-        return const Color(0xFF6B7280);
-    }
-  }
-
-  Color _getStatusColor(UserStatus status) {
-    switch (status) {
-      case UserStatus.verified:
-        return const Color(0xFF10B981);
-      case UserStatus.unverified:
-        return const Color(0xFFF59E0B);
-      case UserStatus.suspended:
-        return const Color(0xFFEF4444);
-    }
   }
 
   Widget _buildDialogButton(

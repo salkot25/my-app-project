@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design_system/design_system.dart';
-import '../../../core/errors/failures.dart';
 import '../../../domain/entities/user.dart';
+import '../../../domain/entities/user_role.dart';
+import '../../../domain/entities/user_status.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_list_provider.dart';
 import 'widgets/user_search_section.dart';
@@ -273,7 +274,8 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
               ),
             ),
 
-            const SizedBox(height: DSTokens.spaceL),
+            const SizedBox(height: DSTokens.spaceS),
+
             // Stats Card - moved to top
             userListState.isLoading
                 ? Container()
@@ -290,6 +292,8 @@ class _UserListScreenState extends ConsumerState<UserListScreen> {
                       });
                     },
                   ),
+
+            //const SizedBox(height: DSTokens.spaceS),
 
             // Search Section
             UserSearchSection(

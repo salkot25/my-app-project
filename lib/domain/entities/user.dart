@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import '../../core/errors/failures.dart';
+import 'user_role.dart';
+import 'user_status.dart';
 
 /// User entity representing a user in the domain layer
 class User extends Equatable {
