@@ -24,8 +24,8 @@ class SuccessDisplay extends ConsumerWidget {
       padding: const EdgeInsets.all(DSTokens.spaceL),
       margin: const EdgeInsets.only(bottom: DSTokens.spaceL),
       decoration: BoxDecoration(
-        color: DSColors.warning.withOpacity(0.1),
-        border: Border.all(color: DSColors.warning.withOpacity(0.3), width: 1),
+        color: DSColors.warning.withValues(alpha: 0.1),
+        border: Border.all(color: DSColors.warning.withValues(alpha: 0.3), width: 1),
         borderRadius: BorderRadius.circular(DSTokens.radiusM),
       ),
       child: Column(
@@ -35,7 +35,7 @@ class SuccessDisplay extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(DSTokens.spaceS),
                 decoration: BoxDecoration(
-                  color: DSColors.warning.withOpacity(0.2),
+                  color: DSColors.warning.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(DSTokens.radiusS),
                 ),
                 child: Icon(

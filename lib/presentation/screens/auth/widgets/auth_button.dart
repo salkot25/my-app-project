@@ -41,7 +41,7 @@ class AuthButton extends ConsumerWidget {
             borderRadius: BorderRadius.circular(DSTokens.radiusM),
           ),
           elevation: isSecondary ? 0 : 2,
-          shadowColor: DSColors.brandPrimary.withOpacity(0.25),
+          shadowColor: DSColors.brandPrimary.withValues(alpha: 0.25),
           padding: EdgeInsets.zero,
         ),
         child: isLoading

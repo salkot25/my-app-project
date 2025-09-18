@@ -109,12 +109,12 @@ class _RoleSelectionDialog extends ConsumerWidget {
             padding: const EdgeInsets.all(DSTokens.spaceM),
             decoration: BoxDecoration(
               color: isCurrentRole
-                  ? color.withOpacity(0.1)
+                  ? color.withValues(alpha: 0.1)
                   : ref.colors.surfaceContainer,
               borderRadius: BorderRadius.circular(DSTokens.radiusM),
               border: Border.all(
                 color: isCurrentRole
-                    ? color.withOpacity(0.3)
+                    ? color.withValues(alpha: 0.3)
                     : ref.colors.border,
                 width: 1,
               ),
@@ -156,7 +156,7 @@ class _RoleSelectionDialog extends ConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(DSTokens.spaceS),
                     ),
                     child: Text(
@@ -267,12 +267,12 @@ class _StatusSelectionDialog extends ConsumerWidget {
             padding: const EdgeInsets.all(DSTokens.spaceM),
             decoration: BoxDecoration(
               color: isCurrentStatus
-                  ? color.withOpacity(0.1)
+                  ? color.withValues(alpha: 0.1)
                   : ref.colors.surfaceContainer,
               borderRadius: BorderRadius.circular(DSTokens.radiusM),
               border: Border.all(
                 color: isCurrentStatus
-                    ? color.withOpacity(0.3)
+                    ? color.withValues(alpha: 0.3)
                     : ref.colors.border,
                 width: 1,
               ),
@@ -316,7 +316,7 @@ class _StatusSelectionDialog extends ConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(DSTokens.spaceS),
                     ),
                     child: Text(
@@ -403,10 +403,10 @@ class _DeleteConfirmationDialog extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(DSTokens.spaceM),
             decoration: BoxDecoration(
-              color: const Color(0xFFEF4444).withOpacity(0.05),
+              color: const Color(0xFFEF4444).withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(DSTokens.radiusM),
               border: Border.all(
-                color: const Color(0xFFEF4444).withOpacity(0.2),
+                color: const Color(0xFFEF4444).withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -482,9 +482,9 @@ class _DeleteConfirmationDialog extends ConsumerWidget {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DSTokens.spaceS),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         label,

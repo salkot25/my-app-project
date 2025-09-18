@@ -366,7 +366,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             FadeTransition(
               opacity: _fadeAnimation,
               child: Container(
-                color: Colors.black.withOpacity(0.75),
+                color: Colors.black.withValues(alpha: 0.75),
                 child: SafeArea(
                   child: Stack(
                     children: [
@@ -387,7 +387,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         right: DSTokens.spaceL,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: TextButton.icon(
@@ -395,12 +395,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             icon: Icon(
                               Icons.close,
                               size: 16,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                             label: Text(
                               'Lewati',
                               style: DSTypography.labelMedium.copyWith(
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                               ),
                             ),
                             style: TextButton.styleFrom(

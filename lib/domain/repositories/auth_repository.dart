@@ -36,4 +36,10 @@ abstract class AuthRepository {
 
   /// Get current user's UID
   String? get currentUserUid;
+
+  /// Change user password
+  Future<Either<AuthFailure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }

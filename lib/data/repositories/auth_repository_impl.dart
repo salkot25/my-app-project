@@ -95,4 +95,22 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   String? get currentUserUid => authRemoteDataSource.currentUserUid;
+
+  @override
+  Future<Either<AuthFailure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await authRemoteDataSource.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return const Right(null);
+    } on AuthFailure catch (failure) {
+      return Left(failure);
+    } catch (e) {
+      return const Left(AuthFailure.unknown());
+    }
+  }
 }

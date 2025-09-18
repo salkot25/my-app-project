@@ -29,12 +29,12 @@ class OnboardingTooltip extends ConsumerWidget {
         color: ref.colors.surface,
         borderRadius: BorderRadius.circular(DSTokens.radiusL),
         border: Border.all(
-          color: DSColors.brandPrimary.withOpacity(0.2),
+          color: DSColors.brandPrimary.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: DSColors.brandPrimary.withOpacity(0.15),
+            color: DSColors.brandPrimary.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -53,7 +53,7 @@ class OnboardingTooltip extends ConsumerWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: DSColors.brandPrimary.withOpacity(0.1),
+                  color: DSColors.brandPrimary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

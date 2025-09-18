@@ -13,8 +13,8 @@ class RegisterIcon extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            DSColors.success.withOpacity(0.2),
-            DSColors.success.withOpacity(0.1),
+            DSColors.success.withValues(alpha: 0.2),
+            DSColors.success.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -23,7 +23,7 @@ class RegisterIcon extends ConsumerWidget {
         // Enhanced shadow for depth
         boxShadow: [
           BoxShadow(
-            color: DSColors.success.withOpacity(0.1),
+            color: DSColors.success.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -37,7 +37,7 @@ class RegisterIcon extends ConsumerWidget {
             width: DSTokens.spaceXXL + DSTokens.spaceM, // 64px
             height: DSTokens.spaceXXL + DSTokens.spaceM, // 64px
             decoration: BoxDecoration(
-              color: DSColors.success.withOpacity(0.1),
+              color: DSColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(DSTokens.radiusL),
             ),
             child: Icon(
@@ -58,7 +58,7 @@ class RegisterIcon extends ConsumerWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: DSColors.success.withOpacity(0.3),
+                    color: DSColors.success.withValues(alpha: 0.3),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

@@ -39,9 +39,9 @@ class _ErrorDisplayState extends ConsumerState<ErrorDisplay> {
             padding: const EdgeInsets.all(DSTokens.spaceM),
             margin: const EdgeInsets.only(bottom: DSTokens.spaceL),
             decoration: BoxDecoration(
-              color: DSColors.error.withOpacity(0.1),
+              color: DSColors.error.withValues(alpha: 0.1),
               border: Border.all(
-                color: DSColors.error.withOpacity(0.3),
+                color: DSColors.error.withValues(alpha: 0.3),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(DSTokens.radiusM),

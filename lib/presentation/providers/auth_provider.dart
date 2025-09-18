@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/remote/auth_remote_datasource.dart';
 import '../../data/datasources/remote/user_remote_datasource.dart';
@@ -100,7 +101,9 @@ class AuthNotifier extends Notifier<AuthState> {
     // Check if there's already a current user (from persistence)
     final currentUser = firebaseAuth.currentUser;
 
-    print('AuthNotifier build - Current user: ${currentUser?.email ?? 'null'}');
+    debugPrint(
+      'AuthNotifier build - Current user: ${currentUser?.email ?? 'null'}',
+    );
 
     // Initialize with current user if exists, but still loading profile
     final initialState = currentUser != null
@@ -133,15 +136,17 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   void _onAuthStateChanged(User? firebaseUser) async {
-    print('Auth state changed: ${firebaseUser?.email ?? 'null'}');
+    debugPrint('Auth state changed: ${firebaseUser?.email ?? 'null'}');
 
     if (firebaseUser == null) {
-      print('No Firebase user, setting empty state');
+      debugPrint('No Firebase user, setting empty state');
       state = const AuthState(isLoading: false);
       return;
     }
 
-    print('Firebase user found, loading profile for UID: ${firebaseUser.uid}');
+    debugPrint(
+      'Firebase user found, loading profile for UID: ${firebaseUser.uid}',
+    );
     state = state.copyWith(
       firebaseUser: firebaseUser,
       isLoading: true,
@@ -155,16 +160,16 @@ class AuthNotifier extends Notifier<AuthState> {
     final userRepository = ref.read(userRepositoryProvider);
 
     // Get domain user profile
-    print('Fetching user profile from Firestore...');
+    debugPrint('Fetching user profile from Firestore...');
     final result = await userRepository.getUserProfile(firebaseUser.uid);
 
     result.fold(
       (failure) {
-        print('Failed to get user profile: ${failure.message}');
+        debugPrint('Failed to get user profile: ${failure.message}');
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (domainUser) {
-        print('User profile loaded successfully: ${domainUser.email}');
+        debugPrint('User profile loaded successfully: ${domainUser.email}');
         state = state.copyWith(
           domainUser: domainUser,
           isLoading: false,
@@ -175,7 +180,7 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> login({required String email, required String password}) async {
-    print('Login attempt for: $email');
+    debugPrint('Login attempt for: $email');
     state = state.copyWith(isLoading: true, error: null);
 
     final loginUseCase = ref.read(loginUseCaseProvider);
@@ -183,11 +188,11 @@ class AuthNotifier extends Notifier<AuthState> {
 
     result.fold(
       (failure) {
-        print('Login failed: ${failure.message}');
+        debugPrint('Login failed: ${failure.message}');
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (user) {
-        print('Login successful for user: ${user.email}');
+        debugPrint('Login successful for user: ${user.email}');
         // Auth state will be updated through the auth state listener
       },
     );
@@ -255,16 +260,47 @@ class AuthNotifier extends Notifier<AuthState> {
 
     result.fold(
       (failure) {
-        print('Failed to update profile: ${failure.message}');
+        debugPrint('Failed to update profile: ${failure.message}');
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (updatedUser) {
-        print('Profile updated successfully: ${updatedUser.email}');
+        debugPrint('Profile updated successfully: ${updatedUser.email}');
         state = state.copyWith(
           domainUser: updatedUser,
           isLoading: false,
           error: null,
         );
+      },
+    );
+  }
+
+  /// Change user password
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    if (!state.isAuthenticated) {
+      state = state.copyWith(error: 'User not authenticated');
+      return;
+    }
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    final authRepository = ref.read(authRepositoryProvider);
+
+    final result = await authRepository.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+
+    result.fold(
+      (failure) {
+        debugPrint('Failed to change password: ${failure.message}');
+        state = state.copyWith(isLoading: false, error: failure.message);
+      },
+      (_) {
+        debugPrint('Password changed successfully');
+        state = state.copyWith(isLoading: false, error: null);
       },
     );
   }

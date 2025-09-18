@@ -106,6 +106,34 @@ class AuthRemoteDataSource {
   /// Get current user's UID
   String? get currentUserUid => firebaseAuth.currentUser?.uid;
 
+  /// Change user password (requires re-authentication)
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        throw const AuthFailure.userNotFound();
+      }
+
+      // Re-authenticate user with current password first
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      // Update password
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseAuthException(e);
+    } catch (e) {
+      throw const AuthFailure.unknown();
+    }
+  }
+
   /// Map Firebase Auth exceptions to our custom failures
   AuthFailure _mapFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {

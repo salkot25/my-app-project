@@ -6,6 +6,7 @@ import '../../../../domain/entities/user_role.dart';
 import '../../../../domain/entities/user_status.dart';
 import 'edit_profile_dialog.dart';
 import 'password_change_dialog.dart';
+import 'profile_activity_dialog.dart';
 
 class ProfileDetailDialog extends ConsumerWidget {
   final User currentUser;
@@ -67,6 +68,21 @@ class ProfileDetailDialog extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => EditProfileDialog(currentUser: currentUser),
+    );
+  }
+
+  void _showRecentActivityDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.8,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) =>
+            ProfileActivityDialog(currentUser: currentUser),
+      ),
     );
   }
 
@@ -405,6 +421,46 @@ class ProfileDetailDialog extends ConsumerWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 DSTokens.radiusM,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: DSTokens.spaceM),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _showRecentActivityDialog(context);
+                          },
+                          icon: Icon(
+                            Icons.timeline_rounded,
+                            size: DSTokens.fontL,
+                            color: DSColors.info,
+                          ),
+                          label: Text(
+                            'Recent Activity',
+                            style: DSTypography.buttonMedium.copyWith(
+                              color: DSColors.info,
+                              fontWeight: DSTokens.fontWeightSemiBold,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            backgroundColor: DSColors.info.withValues(
+                              alpha: 0.08,
+                            ),
+                            foregroundColor: DSColors.info,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: DSTokens.spaceM,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                DSTokens.radiusM,
+                              ),
+                              side: BorderSide(
+                                color: DSColors.info.withValues(alpha: 0.2),
+                                width: 1,
                               ),
                             ),
                           ),

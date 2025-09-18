@@ -31,9 +31,9 @@ class ProgressiveAuthFeatures extends ConsumerWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        ref.colors.border.withOpacity(0.0),
+                        ref.colors.border.withValues(alpha: 0.0),
                         ref.colors.border,
-                        ref.colors.border.withOpacity(0.0),
+                        ref.colors.border.withValues(alpha: 0.0),
                       ],
                     ),
                   ),
@@ -57,9 +57,9 @@ class ProgressiveAuthFeatures extends ConsumerWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        ref.colors.border.withOpacity(0.0),
+                        ref.colors.border.withValues(alpha: 0.0),
                         ref.colors.border,
-                        ref.colors.border.withOpacity(0.0),
+                        ref.colors.border.withValues(alpha: 0.0),
                       ],
                     ),
                   ),

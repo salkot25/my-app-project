@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/connectivity_service.dart';
@@ -108,7 +107,7 @@ class OfflineDemoScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                error: (_, __) => Container(
+                error: (_, _) => Container(
                   margin: const EdgeInsets.only(right: DSTokens.spaceM),
                   padding: const EdgeInsets.all(DSTokens.spaceS),
                   child: Row(
@@ -163,7 +162,7 @@ class OfflineDemoScreen extends ConsumerWidget {
               ),
             ),
             // Smart Status Overview (menggabungkan Quick Stats + Current Status)
-            _SmartStatusOverview(
+            _smartStatusOverview(
               connectivityStatus: connectivityStatus,
               pendingSyncCount: pendingSyncCount,
               canWorkOffline: canWorkOffline,
@@ -329,130 +328,6 @@ class OfflineDemoScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatusTile({
-    required WidgetRef ref,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool? isPositive,
-  }) {
-    final Color color = isPositive == null
-        ? ref.colors.textSecondary
-        : isPositive
-        ? DSColors.success
-        : DSColors.error;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeOutQuart,
-      builder: (context, animValue, child) {
-        return Semantics(
-          label: '$title: $subtitle',
-          hint:
-              'Status indicator showing ${isPositive == true
-                  ? 'good'
-                  : isPositive == false
-                  ? 'warning or error'
-                  : 'loading'} state',
-          readOnly: true,
-          child: Transform.scale(
-            scale: 0.95 + (0.05 * animValue),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(DSTokens.spaceM),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(DSTokens.radiusM),
-                border: Border.all(color: color.withValues(alpha: 0.2)),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // Animated Icon with Pulse Effect
-                  TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.elasticOut,
-                    builder: (context, pulseValue, child) {
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.all(DSTokens.spaceXS),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(DSTokens.radiusS),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withValues(alpha: 0.2),
-                              blurRadius: 2 + (2 * pulseValue),
-                              spreadRadius: pulseValue * 0.5,
-                            ),
-                          ],
-                        ),
-                        child: Transform.rotate(
-                          angle: isPositive == false ? pulseValue * 0.1 : 0,
-                          child: Icon(icon, color: color, size: DSTokens.fontL),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: DSTokens.spaceM),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Animated Title
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 300),
-                          style: DSTypography.labelLarge.copyWith(
-                            color: color,
-                            fontWeight: DSTokens.fontWeightSemiBold,
-                          ),
-                          child: Text(title),
-                        ),
-                        const SizedBox(height: DSTokens.spaceXXS),
-                        // Animated Subtitle
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 300),
-                          style: DSTypography.bodySmall.copyWith(color: color),
-                          child: Text(subtitle),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Status Indicator
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.3),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -651,299 +526,13 @@ class OfflineDemoScreen extends ConsumerWidget {
   }
 
   // Quick Stat Card Widget with Animation
-  Widget _QuickStatCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required Color color,
-    required int animationDelay,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: Duration(milliseconds: 600 + animationDelay),
-      curve: Curves.elasticOut,
-      builder: (context, animValue, child) {
-        return Semantics(
-          label: '$title: $value',
-          hint: 'Status indicator for $title functionality',
-          readOnly: true,
-          child: Transform.scale(
-            scale: 0.8 + (0.2 * animValue),
-            child: Column(
-              children: [
-                TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0, end: 1),
-                  duration: Duration(milliseconds: 1000 + animationDelay),
-                  curve: Curves.bounceOut,
-                  builder: (context, pulseValue, child) {
-                    return Transform.scale(
-                      scale: 0.9 + (0.1 * pulseValue),
-                      child: Container(
-                        padding: const EdgeInsets.all(DSTokens.spaceS),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(DSTokens.radiusM),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withValues(alpha: 0.2),
-                              blurRadius: 4 + (2 * pulseValue),
-                              spreadRadius: pulseValue,
-                            ),
-                          ],
-                        ),
-                        child: Icon(icon, color: color, size: DSTokens.fontL),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: DSTokens.spaceXS),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 300),
-                  style: DSTypography.labelSmall.copyWith(
-                    color: color.withValues(alpha: 0.8),
-                    fontWeight: DSTokens.fontWeightSemiBold,
-                  ),
-                  child: Text(title),
-                ),
-                const SizedBox(height: DSTokens.spaceXXS),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 300),
-                  style: DSTypography.bodyLarge.copyWith(
-                    color: color,
-                    fontWeight: DSTokens.fontWeightBold,
-                  ),
-                  child: Text(value),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   // Shimmer Loading Quick Stat
-  Widget _ShimmerQuickStat({required IconData icon, required String title}) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 1200),
-      curve: Curves.easeInOut,
-      builder: (context, value, child) {
-        return Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(DSTokens.spaceS),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  stops: [
-                    0.3 + (0.4 * value),
-                    0.5 + (0.4 * value),
-                    0.7 + (0.4 * value),
-                  ],
-                  colors: [
-                    DSColors.neutral200.withValues(alpha: 0.3),
-                    DSColors.neutral100.withValues(alpha: 0.5),
-                    DSColors.neutral200.withValues(alpha: 0.3),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(DSTokens.radiusM),
-              ),
-              child: Icon(
-                icon,
-                color: DSColors.neutral300,
-                size: DSTokens.fontL,
-              ),
-            ),
-            const SizedBox(height: DSTokens.spaceXS),
-            Text(
-              title,
-              style: DSTypography.labelSmall.copyWith(
-                color: DSColors.neutral300,
-              ),
-            ),
-            const SizedBox(height: DSTokens.spaceXXS),
-            Container(
-              height: 16,
-              width: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  stops: [
-                    0.3 + (0.4 * value),
-                    0.5 + (0.4 * value),
-                    0.7 + (0.4 * value),
-                  ],
-                  colors: [
-                    DSColors.neutral200.withValues(alpha: 0.3),
-                    DSColors.neutral100.withValues(alpha: 0.5),
-                    DSColors.neutral200.withValues(alpha: 0.3),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(DSTokens.radiusS),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   // Enhanced Error State Tile with Recovery Actions
-  Widget _ErrorStateTile({
-    required WidgetRef ref,
-    required IconData icon,
-    required String title,
-    required String errorMessage,
-    VoidCallback? onRetry,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeOutQuart,
-      builder: (context, animValue, child) {
-        return Semantics(
-          label: '$title error: $errorMessage',
-          hint: onRetry != null ? 'Tap to retry' : 'Error state',
-          button: onRetry != null,
-          child: Transform.scale(
-            scale: 0.95 + (0.05 * animValue),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(DSTokens.spaceM),
-              decoration: BoxDecoration(
-                color: DSColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(DSTokens.radiusM),
-                border: Border.all(
-                  color: DSColors.error.withValues(alpha: 0.2),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: DSColors.error.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Animated Error Icon with Shake Effect
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 1200),
-                        curve: Curves.elasticOut,
-                        builder: (context, shakeValue, child) {
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            padding: const EdgeInsets.all(DSTokens.spaceXS),
-                            decoration: BoxDecoration(
-                              color: DSColors.error.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                DSTokens.radiusS,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: DSColors.error.withValues(alpha: 0.2),
-                                  blurRadius: 2 + (2 * shakeValue),
-                                  spreadRadius: shakeValue * 0.5,
-                                ),
-                              ],
-                            ),
-                            child: Transform.translate(
-                              offset: Offset(
-                                math.sin(shakeValue * 4 * math.pi) * 2,
-                                0,
-                              ),
-                              child: Icon(
-                                icon,
-                                color: DSColors.error,
-                                size: DSTokens.fontL,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(width: DSTokens.spaceM),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Error Title
-                            Text(
-                              title,
-                              style: DSTypography.labelLarge.copyWith(
-                                color: DSColors.error,
-                                fontWeight: DSTokens.fontWeightSemiBold,
-                              ),
-                            ),
-                            const SizedBox(height: DSTokens.spaceXXS),
-                            // Error Message
-                            Text(
-                              errorMessage,
-                              style: DSTypography.bodySmall.copyWith(
-                                color: DSColors.error,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Status Indicator
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: DSColors.error,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: DSColors.error.withValues(alpha: 0.3),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Retry Button (if callback provided)
-                  if (onRetry != null) ...[
-                    const SizedBox(height: DSTokens.spaceM),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: onRetry,
-                        icon: const Icon(Icons.refresh_rounded, size: 16),
-                        label: const Text('Retry'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: DSColors.error,
-                          foregroundColor: DSColors.textOnColor,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: DSTokens.spaceM,
-                            vertical: DSTokens.spaceS,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              DSTokens.radiusS,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   // Smart Status Overview - Menggabungkan Quick Stats + Detailed Info
-  Widget _SmartStatusOverview({
+  Widget _smartStatusOverview({
     required AsyncValue connectivityStatus,
     required AsyncValue<int> pendingSyncCount,
     required AsyncValue<bool> canWorkOffline,
@@ -1051,17 +640,17 @@ class OfflineDemoScreen extends ConsumerWidget {
                             value: connectivityStatus.when(
                               data: (status) => _formatConnectionStatus(status),
                               loading: () => 'Checking...',
-                              error: (_, __) => 'Error',
+                              error: (_, _) => 'Error',
                             ),
                             icon: connectivityStatus.when(
                               data: (status) => _getConnectionIcon(status),
                               loading: () => Icons.refresh_rounded,
-                              error: (_, __) => Icons.warning_rounded,
+                              error: (_, _) => Icons.warning_rounded,
                             ),
                             color: connectivityStatus.when(
                               data: (status) => _getConnectionColor(status),
                               loading: () => ref.colors.textSecondary,
-                              error: (_, __) => DSColors.error,
+                              error: (_, _) => DSColors.error,
                             ),
                             isLoading: connectivityStatus.isLoading,
                             ref: ref,
@@ -1079,7 +668,7 @@ class OfflineDemoScreen extends ConsumerWidget {
                             value: pendingSyncCount.when(
                               data: (count) => '$count items',
                               loading: () => 'Loading...',
-                              error: (_, __) => 'Error',
+                              error: (_, _) => 'Error',
                             ),
                             icon: Icons.sync_rounded,
                             color: pendingSyncCount.when(
@@ -1087,7 +676,7 @@ class OfflineDemoScreen extends ConsumerWidget {
                                   ? DSColors.warning
                                   : DSColors.success,
                               loading: () => ref.colors.textSecondary,
-                              error: (_, __) => DSColors.error,
+                              error: (_, _) => DSColors.error,
                             ),
                             isLoading: pendingSyncCount.isLoading,
                             ref: ref,
@@ -1106,14 +695,14 @@ class OfflineDemoScreen extends ConsumerWidget {
                               data: (canWork) =>
                                   canWork ? 'Available' : 'Limited',
                               loading: () => 'Checking...',
-                              error: (_, __) => 'Unknown',
+                              error: (_, _) => 'Unknown',
                             ),
                             icon: Icons.cloud_off_rounded,
                             color: canWorkOffline.when(
                               data: (canWork) =>
                                   canWork ? DSColors.success : DSColors.warning,
                               loading: () => ref.colors.textSecondary,
-                              error: (_, __) => DSColors.error,
+                              error: (_, _) => DSColors.error,
                             ),
                             isLoading: canWorkOffline.isLoading,
                             ref: ref,

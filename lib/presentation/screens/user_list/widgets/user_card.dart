@@ -233,10 +233,10 @@ class _UserCardState extends ConsumerState<UserCard>
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.1),
+        color: const Color(0xFF10B981).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DSTokens.spaceS),
         border: Border.all(
-          color: const Color(0xFF10B981).withOpacity(0.3),
+          color: const Color(0xFF10B981).withValues(alpha: 0.3),
           width: 1,
         ),
       ),

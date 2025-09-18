@@ -31,7 +31,7 @@ class OfflineStatusIndicator extends ConsumerWidget {
       ),
       loading: () =>
           showDetails ? _buildLoadingIndicator(ref) : const SizedBox.shrink(),
-      error: (_, __) =>
+      error: (_, _) =>
           showDetails ? _buildErrorIndicator(ref) : const SizedBox.shrink(),
     );
   }
@@ -404,7 +404,7 @@ class ConnectivityAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 )
               : const SizedBox.shrink(),
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         ),
       ],
     );

@@ -51,7 +51,7 @@ class CreateUserUseCase {
         ),
       );
 
-      // TODO: This would be the actual implementation with Cloud Functions:
+      // This would be the actual implementation with Cloud Functions:
       // 1. Call Cloud Function to create Firebase Auth account
       // 2. Create Firestore profile with the specified role and status
       //

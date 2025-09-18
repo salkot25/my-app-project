@@ -116,7 +116,7 @@ class UserListStates {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withOpacity(0.1),
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -177,7 +177,7 @@ class UserListStates {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.1),
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -230,10 +230,10 @@ class UserListStates {
           vertical: DSTokens.spaceM,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFF3498DB).withOpacity(0.1),
+          color: const Color(0xFF3498DB).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(DSTokens.radiusM),
           border: Border.all(
-            color: const Color(0xFF3498DB).withOpacity(0.3),
+            color: const Color(0xFF3498DB).withValues(alpha: 0.3),
             width: 1,
           ),
         ),

@@ -87,25 +87,25 @@ class _MyAppState extends ConsumerState<MyApp> {
       final isAuthenticated = authState.isAuthenticated;
       final isOfflineMode = authState.isOfflineMode;
 
-      print(
+      debugPrint(
         'Router redirect - Auth state: isLoading=$isLoading, isAuthenticated=$isAuthenticated, isOfflineMode=$isOfflineMode, location=${state.fullPath}',
       );
 
       // Show loading screen if auth state is still loading and we're not already there
       if (isLoading && state.fullPath != '/loading') {
-        print('Redirecting to loading screen');
+        debugPrint('Redirecting to loading screen');
         return '/loading';
       }
 
       // If auth state is loaded and we're on loading screen, redirect appropriately
       if (!isLoading && state.fullPath == '/loading') {
         if (isAuthenticated) {
-          print(
+          debugPrint(
             'Auth loaded and authenticated, redirecting from loading to main',
           );
           return '/main';
         } else {
-          print(
+          debugPrint(
             'Auth loaded but not authenticated, redirecting from loading to login',
           );
           return '/login';
@@ -118,7 +118,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
       // If not authenticated and trying to access protected route
       if (!isAuthenticated && !isLoading && !isPublicRoute) {
-        print('Not authenticated, redirecting to login');
+        debugPrint('Not authenticated, redirecting to login');
         return '/login';
       }
 
@@ -127,11 +127,11 @@ class _MyAppState extends ConsumerState<MyApp> {
           !isLoading &&
           isPublicRoute &&
           state.fullPath != '/loading') {
-        print('Authenticated, redirecting from public route to main');
+        debugPrint('Authenticated, redirecting from public route to main');
         return '/main';
       }
 
-      print('No redirect needed');
+      debugPrint('No redirect needed');
       return null; // No redirect needed
     },
     routes: [

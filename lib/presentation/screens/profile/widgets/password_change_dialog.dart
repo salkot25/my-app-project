@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../design_system/design_system.dart';
 import '../../../../domain/entities/user.dart';
 import '../../../../domain/entities/user_role.dart';
+import '../../../providers/auth_provider.dart';
 
 class PasswordChangeDialog extends ConsumerStatefulWidget {
   final User currentUser;
@@ -49,24 +50,32 @@ class _PasswordChangeDialogState extends ConsumerState<PasswordChangeDialog> {
       setState(() => _isLoading = true);
 
       try {
-        // TODO: Implement password change functionality
-        // This would require adding a changePassword method to the AuthProvider
-        // For now, we'll simulate the functionality
+        // Use the AuthProvider to change password
+        await ref
+            .read(authProvider.notifier)
+            .changePassword(
+              currentPassword: _currentPasswordController.text,
+              newPassword: _newPasswordController.text,
+            );
 
-        await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+        // Check if the operation was successful
+        final authState = ref.read(authProvider);
+        if (authState.error != null) {
+          throw Exception(authState.error);
+        }
 
-        // Show coming soon message for now
+        // Show success message and close dialog
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Password change feature coming soon!',
+                'Password changed successfully!',
                 style: DSTypography.bodyMedium.copyWith(
                   color: DSColors.textOnColor,
                 ),
               ),
-              backgroundColor: DSColors.warning,
+              backgroundColor: DSColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DSTokens.radiusM),
@@ -76,10 +85,28 @@ class _PasswordChangeDialogState extends ConsumerState<PasswordChangeDialog> {
         }
       } catch (e) {
         if (mounted) {
+          String errorMessage = 'Failed to change password';
+
+          // Map common error messages to user-friendly text
+          final errorString = e.toString().toLowerCase();
+          if (errorString.contains('wrong-password') ||
+              errorString.contains('invalid-credential')) {
+            errorMessage = 'Current password is incorrect';
+          } else if (errorString.contains('weak-password')) {
+            errorMessage = 'New password is too weak';
+          } else if (errorString.contains('requires-recent-login')) {
+            errorMessage =
+                'Please log out and log in again, then try changing your password';
+          } else if (errorString.contains('too-many-requests')) {
+            errorMessage = 'Too many attempts. Please try again later';
+          } else if (errorString.contains('network')) {
+            errorMessage = 'Network error. Please check your connection';
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'An error occurred: ${e.toString()}',
+                errorMessage,
                 style: DSTypography.bodyMedium.copyWith(
                   color: DSColors.textOnColor,
                 ),

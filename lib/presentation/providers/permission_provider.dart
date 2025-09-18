@@ -192,7 +192,7 @@ final permissionStatusProvider =
       return permissionsAsync.when(
         data: (permissions) => permissions[type]?.status,
         loading: () => null,
-        error: (_, __) => null,
+        error: (_, _) => null,
       );
     });
 
@@ -221,7 +221,7 @@ final criticalPermissionsDeniedProvider = Provider<List<AppPermissionType>>((
       }).toList();
     },
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 });
 
@@ -270,7 +270,7 @@ final permissionSummaryProvider = Provider<Map<String, int>>((ref) {
       'notRequested': 0,
       'permanentlyDenied': 0,
     },
-    error: (_, __) => {
+    error: (_, _) => {
       'total': 0,
       'granted': 0,
       'denied': 0,
